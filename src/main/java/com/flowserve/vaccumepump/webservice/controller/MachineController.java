@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 public class MachineController {
+	
 
 	private static final Logger LOGGER = Logger.getLogger(MachineController.class.getName());
 	
