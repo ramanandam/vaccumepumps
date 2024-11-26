@@ -6,10 +6,10 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.0.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.in28minutes.rest.webservices</groupId>
-	<artifactId>restful-web-services</artifactId>
+	<groupId>com.flowserve.vaccumepump.webservice</groupId>
+	<artifactId>vaccumepump</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>restful-web-services</name>
 	<description>Demo project for Spring Boot</description>
@@ -17,9 +17,6 @@
 		<java.version>17</java.version>
 	</properties>
 	<dependencies>
-		
-		
-		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -28,11 +25,9 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
-<dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
-			
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -45,21 +40,16 @@
 			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
-		
-		
-<dependency>
-    <groupId>mysql</groupId>
-    <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.33</version>
-</dependency>
-
-
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.33</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -74,36 +64,31 @@
 			
 		</dependency>-->
 		<dependency>
-	<groupId>org.springdoc</groupId>
-	<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-	<version>2.3.0</version>
-</dependency>
-<!--<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version>
+		</dependency>
+		<!--<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 		</dependency>-->
-
+		<!--
 		<dependency>
 			<groupId>com.jpa.hibernate</groupId>
 			<artifactId>com.jpa.hibernate.demo</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		
+		</dependency>-->
 		<!-- https://mvnrepository.com/artifact/com.jacob/jacob -->
- 
-
-		
-		
 	</dependencies>
-	
-
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!--<configuration>
+                <mainClass>com.flowserve.vaccumepump.webservice.VaccumepumpsApplication</mainClass>
+            </configuration>-->
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
