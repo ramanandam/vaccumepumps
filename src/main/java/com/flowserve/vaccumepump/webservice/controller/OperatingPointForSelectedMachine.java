@@ -436,116 +436,125 @@ public class OperatingPointForSelectedMachine {
 		return ResponseEntity.ok().body(respose);
 
 	}
-	
-	
-	
+
 	/*
 	 * Sub Button_BF_Temperatur_optimieren()
-
-Dim Fehler As Fehlercodetyp
-Dim Maschinen_ID, Werkstoff_ID, n
-Dim Formular As Worksheet
-Dim p_1, p_2, T_1, T_BF, V_1_Gas_gesamt_soll, V_1_Gas_rel, Gas, BF, V_1_F, T_BF_opt
-Dim Ber_Grp
-Dim a As Range
-Dim felder_gefuellt As Boolean
-Dim i As Integer
-
-Set Formular = Worksheets("Formular")
-
-stc_Makro_Berechnung = True
-
-Maschinen_ID = Application.Names("Formular_Maschinen_ID").RefersToRange
-Werkstoff_ID = Application.Names("Formular_werkstoff_ID").RefersToRange
-n = Application.Names("Formular_Drehzahl").RefersToRange
-V_1_Gas_gesamt_soll = Application.Names("Formular_V_1_Gas_gesamt_soll").RefersToRange
-p_1 = Application.Names("Formular_p_1").RefersToRange
-p_2 = Application.Names("Formular_p_2").RefersToRange
-T_1 = Application.Names("Formular_T_1").RefersToRange
-T_BF = Application.Names("Formular_T_BF").RefersToRange
-V_1_F = Application.Names("Formular_V_1_F").RefersToRange
-BF = Application.Names("Formular_BF").RefersToRange
-Ber_Grp = Application.Names("Formular_Berechtigungsgruppe").RefersToRange
-
-If stc_Ergebnis <> 0 Or stc_Berechnungsart <> 6 Then
-' Es darf nur die relative Volumenstromverteilung vorgegeben sein, da nur diese in die Berechnung mit einfließt
-    If stc_V_1_Gas_gegeben Or stc_V_1_Gas_gesamt_gegeben Or stc_m_1_Gas_gegeben Or stc_m_1_Gas_gesamt_gegeben Or stc_m_1_Gas_rel_gegeben Then
-        stc_V_1_Gas_gegeben = False
-        stc_V_1_Gas_gesamt_gegeben = False
-        stc_m_1_Gas_gegeben = False
-        stc_m_1_Gas_gesamt_gegeben = False
-        stc_m_1_Gas_rel_gegeben = False
-        felder_gefuellt = False
-        For Each a In Application.Names("Formular_V_1_Gas_rel").RefersToRange
-            i = i + 1
-            If i > stc_Anzahl_Gase Then Exit For
-            If Not IsEmpty(a) Then felder_gefuellt = True
-        Next a
-        If felder_gefuellt Then stc_V_1_Gas_rel_gegeben = True
-    End If
-    stc_Ergebnis = 0
-    stc_Berechnungsart = 6
-    Call stc_neu_markieren
-    Exit Sub
-End If
-
-
-' Einlesen der relativen Volumenstromverteilung der einzelnen Gaskomponenten, sofern gegeben
-
-For i = 1 To 6
-    If Not IsEmpty(Application.Names("Formular_Gas_" & CStr(i)).RefersToRange) Then
-        If i = 1 Then
-            ReDim Gas(1 To 1)
-            If stc_V_1_Gas_rel_gegeben Then
-                ReDim V_1_Gas_rel(1 To 1)
-            End If
-        Else
-            ReDim Preserve Gas(1 To i)
-            If stc_V_1_Gas_rel_gegeben Then
-                ReDim Preserve V_1_Gas_rel(1 To i)
-            End If
-        End If
-        Gas(i) = Application.Names("Formular_Gas_" & CStr(i)).RefersToRange
-        If stc_V_1_Gas_rel_gegeben Then
-            V_1_Gas_rel(i) = Application.Names("Formular_V_1_Gas_rel_" & CStr(i)).RefersToRange
-        End If
-    Else
-        Exit For
-    End If
-Next i
-
-
-Call Optimale_BF_Temperatur(Fehler, CStr(Maschinen_ID), Werkstoff_ID, n, p_1, p_2, T_1, T_BF, Gas, V_1_Gas_rel, BF, V_1_F, Ber_Grp, V_1_Gas_gesamt_soll, T_BF_opt)
-
-Application.Names("Formular_T_BF_opt").RefersToRange = T_BF_opt
-
-Call Fehlertext_anzeigen(Fehler)
-If Fehlerart_kritisch(Fehler) = 1 Or Fehlerart_kritisch(Fehler) = 2 Then
-    stc_Ergebnis = -1
-Else
-    stc_Ergebnis = 1
-End If
-
-stc_Makro_Berechnung = False
-
-Call stc_neu_markieren
-
-End Sub
+	 * 
+	 * Dim Fehler As Fehlercodetyp Dim Maschinen_ID, Werkstoff_ID, n Dim Formular As
+	 * Worksheet Dim p_1, p_2, T_1, T_BF, V_1_Gas_gesamt_soll, V_1_Gas_rel, Gas, BF,
+	 * V_1_F, T_BF_opt Dim Ber_Grp Dim a As Range Dim felder_gefuellt As Boolean Dim
+	 * i As Integer
+	 * 
+	 * Set Formular = Worksheets("Formular")
+	 * 
+	 * stc_Makro_Berechnung = True
+	 * 
+	 * Maschinen_ID = Application.Names("Formular_Maschinen_ID").RefersToRange
+	 * Werkstoff_ID = Application.Names("Formular_werkstoff_ID").RefersToRange n =
+	 * Application.Names("Formular_Drehzahl").RefersToRange V_1_Gas_gesamt_soll =
+	 * Application.Names("Formular_V_1_Gas_gesamt_soll").RefersToRange p_1 =
+	 * Application.Names("Formular_p_1").RefersToRange p_2 =
+	 * Application.Names("Formular_p_2").RefersToRange T_1 =
+	 * Application.Names("Formular_T_1").RefersToRange T_BF =
+	 * Application.Names("Formular_T_BF").RefersToRange V_1_F =
+	 * Application.Names("Formular_V_1_F").RefersToRange BF =
+	 * Application.Names("Formular_BF").RefersToRange Ber_Grp =
+	 * Application.Names("Formular_Berechtigungsgruppe").RefersToRange
+	 * 
+	 * If stc_Ergebnis <> 0 Or stc_Berechnungsart <> 6 Then ' Es darf nur die
+	 * relative Volumenstromverteilung vorgegeben sein, da nur diese in die
+	 * Berechnung mit einfließt If stc_V_1_Gas_gegeben Or stc_V_1_Gas_gesamt_gegeben
+	 * Or stc_m_1_Gas_gegeben Or stc_m_1_Gas_gesamt_gegeben Or
+	 * stc_m_1_Gas_rel_gegeben Then stc_V_1_Gas_gegeben = False
+	 * stc_V_1_Gas_gesamt_gegeben = False stc_m_1_Gas_gegeben = False
+	 * stc_m_1_Gas_gesamt_gegeben = False stc_m_1_Gas_rel_gegeben = False
+	 * felder_gefuellt = False For Each a In
+	 * Application.Names("Formular_V_1_Gas_rel").RefersToRange i = i + 1 If i >
+	 * stc_Anzahl_Gase Then Exit For If Not IsEmpty(a) Then felder_gefuellt = True
+	 * Next a If felder_gefuellt Then stc_V_1_Gas_rel_gegeben = True End If
+	 * stc_Ergebnis = 0 stc_Berechnungsart = 6 Call stc_neu_markieren Exit Sub End
+	 * If
+	 * 
+	 * 
+	 * ' Einlesen der relativen Volumenstromverteilung der einzelnen Gaskomponenten,
+	 * sofern gegeben
+	 * 
+	 * For i = 1 To 6 If Not IsEmpty(Application.Names("Formular_Gas_" &
+	 * CStr(i)).RefersToRange) Then If i = 1 Then ReDim Gas(1 To 1) If
+	 * stc_V_1_Gas_rel_gegeben Then ReDim V_1_Gas_rel(1 To 1) End If Else ReDim
+	 * Preserve Gas(1 To i) If stc_V_1_Gas_rel_gegeben Then ReDim Preserve
+	 * V_1_Gas_rel(1 To i) End If End If Gas(i) = Application.Names("Formular_Gas_"
+	 * & CStr(i)).RefersToRange If stc_V_1_Gas_rel_gegeben Then V_1_Gas_rel(i) =
+	 * Application.Names("Formular_V_1_Gas_rel_" & CStr(i)).RefersToRange End If
+	 * Else Exit For End If Next i
+	 * 
+	 * 
+	 * Call Optimale_BF_Temperatur(Fehler, CStr(Maschinen_ID), Werkstoff_ID, n, p_1,
+	 * p_2, T_1, T_BF, Gas, V_1_Gas_rel, BF, V_1_F, Ber_Grp, V_1_Gas_gesamt_soll,
+	 * T_BF_opt)
+	 * 
+	 * Application.Names("Formular_T_BF_opt").RefersToRange = T_BF_opt
+	 * 
+	 * Call Fehlertext_anzeigen(Fehler) If Fehlerart_kritisch(Fehler) = 1 Or
+	 * Fehlerart_kritisch(Fehler) = 2 Then stc_Ergebnis = -1 Else stc_Ergebnis = 1
+	 * End If
+	 * 
+	 * stc_Makro_Berechnung = False
+	 * 
+	 * Call stc_neu_markieren
+	 * 
+	 * End Sub
 	 * 
 	 * 
 	 * 
 	 */
-	
-	
-	//Optimize BF temperature
+
+	// Optimize BF temperature
 
 	@RequestMapping(value = "/vaccumepumps/rest/buttomOptimizeBFTemperature/change", method = RequestMethod.POST)
 	public ResponseEntity<IVacuumPumpDetails> buttomOptimizeBFTemperature(@RequestBody IVacuumSelectionInputs input) {
 		IVacuumPumpDetails respose = new IVacuumPumpDetails();
 		
+		ErrorCodeTable fehler = new ErrorCodeTable();
+		String machineID=input.getMachineID();
+				String  Werkstoff_ID=input.getMaterialID();
+				double n = Double.parseDouble((input.getVacuumOperation()));
+		double p_1=input.getP_1();
+		double p_2=input.getP_2();
+		double T_1=input.getT_1();
+		double T_BF=input.getT_BF();
+		double V_1_Gas_gesamt_soll=input.getV_1_Gas_gesamt_soll();
+		double  V_1_Gas_rel=input.getV_1_Gas_rel();
 		
+		double Gas=input.getGas();
 		
-		
+		double  BF=input.getBf();
+		double V_1_F=input.getV_1_F();
+		double T_BF_opt=input.getOptimizedBFtemperature();
+		String Berechtigungsgruppe=input.getPermissionGroup();
+		boolean felder_gefuellt=input.isFields_filled();
+		int stcCalculationType = 6;
+		 if (input.getStc_result()!=0  || input.getStcCalculationType()!=6) {
+		 
+				if (input.isStc_V_1_Gas_gegeben() || input.isStc_V_1_Gas_gesamt_gegeben()
+						|| input.isStc_m_1_Gas_gegeben() || input.isStc_m_1_Gas_gesamt_gegeben()
+
+						|| input.isStc_m_1_Gas_rel_gegeben()
+
+				)
+		    {
+		    	
+					respose.setStc_V_1_Gas_gegeben(false);
+					respose.setStc_V_1_Gas_gesamt_gegeben(false);
+					respose.setStc_m_1_Gas_gegeben(false);
+					respose.setStc_m_1_Gas_gesamt_gegeben(false);
+					respose.setStc_m_1_Gas_rel_gegeben(false);
+					respose.setFields_filled(false)
+					
+		    }
+		 
+		 
+		 }
 		return ResponseEntity.ok().body(respose);
 		
 	}

@@ -135,9 +135,14 @@ public class IVacuumPumpDetails implements Serializable {
 	private double P_2_max;
 	
 	
+private boolean stc_V_1_Gas_gegeben;
 	
+	private boolean stc_V_1_Gas_gesamt_gegeben;
+	private boolean stc_m_1_Gas_gegeben;
+	private boolean stc_m_1_Gas_gesamt_gegeben;
+	private boolean stc_m_1_Gas_rel_gegeben;
 	
-
+	private boolean fields_filled;
 	 
 
 	public String getMachineType() {
@@ -782,6 +787,54 @@ public class IVacuumPumpDetails implements Serializable {
 
 	public void setP_2_max(double p_2_max) {
 		P_2_max = p_2_max;
+	}
+
+	public boolean isStc_V_1_Gas_gegeben() {
+		return stc_V_1_Gas_gegeben;
+	}
+
+	public void setStc_V_1_Gas_gegeben(boolean stc_V_1_Gas_gegeben) {
+		this.stc_V_1_Gas_gegeben = stc_V_1_Gas_gegeben;
+	}
+
+	public boolean isStc_V_1_Gas_gesamt_gegeben() {
+		return stc_V_1_Gas_gesamt_gegeben;
+	}
+
+	public void setStc_V_1_Gas_gesamt_gegeben(boolean stc_V_1_Gas_gesamt_gegeben) {
+		this.stc_V_1_Gas_gesamt_gegeben = stc_V_1_Gas_gesamt_gegeben;
+	}
+
+	public boolean isStc_m_1_Gas_gegeben() {
+		return stc_m_1_Gas_gegeben;
+	}
+
+	public void setStc_m_1_Gas_gegeben(boolean stc_m_1_Gas_gegeben) {
+		this.stc_m_1_Gas_gegeben = stc_m_1_Gas_gegeben;
+	}
+
+	public boolean isStc_m_1_Gas_gesamt_gegeben() {
+		return stc_m_1_Gas_gesamt_gegeben;
+	}
+
+	public void setStc_m_1_Gas_gesamt_gegeben(boolean stc_m_1_Gas_gesamt_gegeben) {
+		this.stc_m_1_Gas_gesamt_gegeben = stc_m_1_Gas_gesamt_gegeben;
+	}
+
+	public boolean isStc_m_1_Gas_rel_gegeben() {
+		return stc_m_1_Gas_rel_gegeben;
+	}
+
+	public void setStc_m_1_Gas_rel_gegeben(boolean stc_m_1_Gas_rel_gegeben) {
+		this.stc_m_1_Gas_rel_gegeben = stc_m_1_Gas_rel_gegeben;
+	}
+
+	public boolean isFields_filled() {
+		return fields_filled;
+	}
+
+	public void setFields_filled(boolean fields_filled) {
+		this.fields_filled = fields_filled;
 	}
 
 }

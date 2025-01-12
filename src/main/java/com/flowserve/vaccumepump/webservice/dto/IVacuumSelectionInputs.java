@@ -22,8 +22,8 @@ public class IVacuumSelectionInputs implements Serializable{
 	private int stcCalculationType;//stcBerechnungsart
 	private boolean  stc_Macro_Calculation
 ;//stc_Makro_Berechnung;
-	
-	
+	private double V_1_Gas_gesamt_soll;
+	private double optimizedBFtemperature;//Optimierte BF-Temperatur [°C];
 	private double rehzahl;
 	
 	
@@ -153,6 +153,19 @@ private boolean stc_m_1_Gas_Total_Given;
 	 private boolean freieDrehzahl60Hz;// --> 1,2*NN
 	private boolean freieDrehzahl50Hz;// --> NN
 	private boolean isFreieDrehzahl;
+	
+	private boolean fields_filled;//felder_gefuellt;
+	private boolean stc_V_1_Gas_gegeben;
+	
+	private boolean stc_V_1_Gas_gesamt_gegeben;
+	private boolean stc_m_1_Gas_gegeben;
+	private boolean stc_m_1_Gas_gesamt_gegeben;
+	private boolean stc_m_1_Gas_rel_gegeben;
+	
+	
+	 
+	
+	
 	
 	public String getMaterialID() {
 		return materialID;
@@ -751,5 +764,69 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setT_2(String t_2) {
 		T_2 = t_2;
+	}
+
+	public double getV_1_Gas_gesamt_soll() {
+		return V_1_Gas_gesamt_soll;
+	}
+
+	public void setV_1_Gas_gesamt_soll(double v_1_Gas_gesamt_soll) {
+		V_1_Gas_gesamt_soll = v_1_Gas_gesamt_soll;
+	}
+
+	public double getOptimizedBFtemperature() {
+		return optimizedBFtemperature;
+	}
+
+	public void setOptimizedBFtemperature(double optimizedBFtemperature) {
+		this.optimizedBFtemperature = optimizedBFtemperature;
+	}
+
+	public boolean isFields_filled() {
+		return fields_filled;
+	}
+
+	public void setFields_filled(boolean fields_filled) {
+		this.fields_filled = fields_filled;
+	}
+
+	public boolean isStc_V_1_Gas_gegeben() {
+		return stc_V_1_Gas_gegeben;
+	}
+
+	public void setStc_V_1_Gas_gegeben(boolean stc_V_1_Gas_gegeben) {
+		this.stc_V_1_Gas_gegeben = stc_V_1_Gas_gegeben;
+	}
+
+	public boolean isStc_V_1_Gas_gesamt_gegeben() {
+		return stc_V_1_Gas_gesamt_gegeben;
+	}
+
+	public void setStc_V_1_Gas_gesamt_gegeben(boolean stc_V_1_Gas_gesamt_gegeben) {
+		this.stc_V_1_Gas_gesamt_gegeben = stc_V_1_Gas_gesamt_gegeben;
+	}
+
+	public boolean isStc_m_1_Gas_gegeben() {
+		return stc_m_1_Gas_gegeben;
+	}
+
+	public void setStc_m_1_Gas_gegeben(boolean stc_m_1_Gas_gegeben) {
+		this.stc_m_1_Gas_gegeben = stc_m_1_Gas_gegeben;
+	}
+
+	public boolean isStc_m_1_Gas_gesamt_gegeben() {
+		return stc_m_1_Gas_gesamt_gegeben;
+	}
+
+	public void setStc_m_1_Gas_gesamt_gegeben(boolean stc_m_1_Gas_gesamt_gegeben) {
+		this.stc_m_1_Gas_gesamt_gegeben = stc_m_1_Gas_gesamt_gegeben;
+	}
+
+	public boolean isStc_m_1_Gas_rel_gegeben() {
+		return stc_m_1_Gas_rel_gegeben;
+	}
+
+	public void setStc_m_1_Gas_rel_gegeben(boolean stc_m_1_Gas_rel_gegeben) {
+		this.stc_m_1_Gas_rel_gegeben = stc_m_1_Gas_rel_gegeben;
 	}
 }
