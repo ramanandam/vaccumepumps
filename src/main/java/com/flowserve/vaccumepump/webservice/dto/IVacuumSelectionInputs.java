@@ -1,10 +1,13 @@
  package com.flowserve.vaccumepump.webservice.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class IVacuumSelectionInputs implements Serializable{
 
-	
+	private int stc_Number_of_Gases=10;//Expect this is as a contact value set ..already ..stc_Anzahl_Gase
+	private boolean stc_V_1_Gas_rel_gegeben=false;//Constat value set already ..need to update through logic 
 	private String machineID;
 	private String materialID;//Werkstoff_ID
 	private String vacuumOperation;
@@ -38,6 +41,10 @@ public class IVacuumSelectionInputs implements Serializable{
 	//Delta_p_Waermetauscher [mbar]
 	private double gas;//Gas (Stoff_ID)
 	private double 	V_1_Gas_rel;//Formular_V_1_Gas_rel_1....
+	
+	List<Double> V_1_Gas_rel_List=new ArrayList<>();	//Consider all the valuues are added in UI like Formular_V_1_Gas_rel_1,Formular_V_1_Gas_rel_2.....
+	
+	
 	private double V_1_Gas;//Formular_V_1_Gas_1;
 	private double m_1_Gas_rel;//Formular_m_1_Gas_rel_2
 	private double m_1_Gas;//Formular_m_1_Gas_1;
@@ -828,5 +835,29 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setStc_m_1_Gas_rel_gegeben(boolean stc_m_1_Gas_rel_gegeben) {
 		this.stc_m_1_Gas_rel_gegeben = stc_m_1_Gas_rel_gegeben;
+	}
+
+	public List<Double> getV_1_Gas_rel_List() {
+		return V_1_Gas_rel_List;
+	}
+
+	public void setV_1_Gas_rel_List(List<Double> v_1_Gas_rel_List) {
+		V_1_Gas_rel_List = v_1_Gas_rel_List;
+	}
+
+	public int getStc_Number_of_Gases() {
+		return stc_Number_of_Gases;
+	}
+
+	public void setStc_Number_of_Gases(int stc_Number_of_Gases) {
+		this.stc_Number_of_Gases = stc_Number_of_Gases;
+	}
+
+	public boolean isStc_V_1_Gas_rel_gegeben() {
+		return stc_V_1_Gas_rel_gegeben;
+	}
+
+	public void setStc_V_1_Gas_rel_gegeben(boolean stc_V_1_Gas_rel_gegeben) {
+		this.stc_V_1_Gas_rel_gegeben = stc_V_1_Gas_rel_gegeben;
 	}
 }

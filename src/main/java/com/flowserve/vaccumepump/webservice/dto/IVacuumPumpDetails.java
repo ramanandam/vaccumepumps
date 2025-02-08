@@ -8,8 +8,8 @@ import com.flowserve.vaccumepump.webservice.model.SubstanceNameTable;
 
 public class IVacuumPumpDetails implements Serializable {
 
-	
-	
+	private int stcCalculationType;//stcBerechnungsart
+	private boolean stc_V_1_Gas_rel_gegeben=false;//Constat value set already ..need to update through logic
 	private List<String> machineIdList;
 	private String machineType;
 	private int ratedSpeedRpm;
@@ -835,6 +835,22 @@ private boolean stc_V_1_Gas_gegeben;
 
 	public void setFields_filled(boolean fields_filled) {
 		this.fields_filled = fields_filled;
+	}
+
+	public boolean isStc_V_1_Gas_rel_gegeben() {
+		return stc_V_1_Gas_rel_gegeben;
+	}
+
+	public void setStc_V_1_Gas_rel_gegeben(boolean stc_V_1_Gas_rel_gegeben) {
+		this.stc_V_1_Gas_rel_gegeben = stc_V_1_Gas_rel_gegeben;
+	}
+
+	public int getStcCalculationType() {
+		return stcCalculationType;
+	}
+
+	public void setStcCalculationType(int stcCalculationType) {
+		this.stcCalculationType = stcCalculationType;
 	}
 
 }

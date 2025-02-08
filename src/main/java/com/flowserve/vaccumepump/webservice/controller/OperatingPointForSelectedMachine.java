@@ -1,5 +1,7 @@
 package com.flowserve.vaccumepump.webservice.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -534,27 +536,44 @@ public class OperatingPointForSelectedMachine {
 		String Berechtigungsgruppe=input.getPermissionGroup();
 		boolean felder_gefuellt=input.isFields_filled();
 		int stcCalculationType = 6;
-		 if (input.getStc_result()!=0  || input.getStcCalculationType()!=6) {
-		 
-				if (input.isStc_V_1_Gas_gegeben() || input.isStc_V_1_Gas_gesamt_gegeben()
-						|| input.isStc_m_1_Gas_gegeben() || input.isStc_m_1_Gas_gesamt_gegeben()
+		if (input.getStc_result() != 0 || input.getStcCalculationType() != 6) {
 
-						|| input.isStc_m_1_Gas_rel_gegeben()
+			if (input.isStc_V_1_Gas_gegeben() || input.isStc_V_1_Gas_gesamt_gegeben() || input.isStc_m_1_Gas_gegeben()
+					|| input.isStc_m_1_Gas_gesamt_gegeben()
 
-				)
-		    {
-		    	
-					respose.setStc_V_1_Gas_gegeben(false);
-					respose.setStc_V_1_Gas_gesamt_gegeben(false);
-					respose.setStc_m_1_Gas_gegeben(false);
-					respose.setStc_m_1_Gas_gesamt_gegeben(false);
-					respose.setStc_m_1_Gas_rel_gegeben(false);
-					respose.setFields_filled(false)
-					
-		    }
-		 
-		 
-		 }
+					|| input.isStc_m_1_Gas_rel_gegeben()
+
+			) {
+
+				respose.setStc_V_1_Gas_gegeben(false);
+				respose.setStc_V_1_Gas_gesamt_gegeben(false);
+				respose.setStc_m_1_Gas_gegeben(false);
+				respose.setStc_m_1_Gas_gesamt_gegeben(false);
+				respose.setStc_m_1_Gas_rel_gegeben(false);
+				respose.setFields_filled(false);
+				
+				int stc_Number_of_Gases=input.getStc_Number_of_Gases();
+				int i=0;
+				List<Double> V_1_Gas_rel_List=input.getV_1_Gas_rel_List();
+				for(Double d:V_1_Gas_rel_List)
+				{
+					i++;
+					if(i>stc_Number_of_Gases) break;
+					if(d!=null)
+					{
+						respose.setFields_filled(true);
+					}
+				}
+				
+				
+						respose.setStc_V_1_Gas_gesamt_gegeben(respose.isFields_filled());
+
+			}
+			respose.setStc_result(0);
+			respose.setStcCalculationType(6);
+			
+			FormUtil.stc_new_mark();
+		}
 		return ResponseEntity.ok().body(respose);
 		
 	}
