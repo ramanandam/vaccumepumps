@@ -11,7 +11,7 @@ public class IVacuumPumpDetails implements Serializable {
 	
 	private double V_1_Toleranz_plus;
 	private double V_1_Toleranz_minus;
-	private double nNominalFactor;//nNennFaktor;
+	private double nNominalFactor;//nNennFaktor;//n_nenn_Faktor//n_nenn_factor
 	
 	private int stcCalculationType;//stc_Berechnungsart
 	private boolean stc_V_1_Gas_rel_gegeben=false;//Constat value set already ..need to update through logic

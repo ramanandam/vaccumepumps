@@ -241,10 +241,21 @@ End Sub
 		String Berechtigungsgruppe=input.getPermissionGroup();
 		boolean felder_gefuellt=input.isFields_filled();
 		int stcCalculationType = 6;
-		double P_mech;
+		double P_mech = 0;
+		double betr_art = 0;
+		int[] errorTypeSelection = null;//fehlerartAuswahl;
+		int n_fest = 0;
+		String Ber_Grp = null;
        // Call Maschinenauswahl(Fehler, Maschinen_ID, Werkstoff_ID, n, betr_art, V_1_Gas_gesamt, P_mech, V_BF, Fehlerart_Auswahl, V_1_Gas_gesamt_soll, p_1, p_2, T_1, T_BF, Gas, V_1_Gas_rel, BF, V_1_F, n_nenn_Faktor, n_fest, V_1_Toleranz_plus, V_1_Toleranz_minus, Ber_Grp)
-        FormUtil.machineSelection(fehler,machineID,Werkstoff_ID,n,betrArt,V_1_Gas_Total_Volume,P_mech,input.getV_BF(),);
-		return ResponseEntity.ok().body(respose);
+        FormUtil.machineSelection(fehler,machineID,Werkstoff_ID,n,betr_art,V_1_Gas_Total_Volume,P_mech,input.getV_BF(),errorTypeSelection,V_1_Gas_gesamt_soll,p_1,p_2,T_BF,Gas,V_1_Gas_rel,BF,V_1_F,input.getnNominalFactor(),n_fest,input.getV_1_Toleranz_plus(),input.getV_1_Toleranz_minus(),Ber_Grp);
+		
+        if (machineID != null) {
+        	
+        	
+        
+        
+        
+        return ResponseEntity.ok().body(respose);
 		
 	}
 	

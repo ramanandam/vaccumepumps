@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public class IVacuumSelectionInputs implements Serializable{
-
+	private double nNominalFactor;//nNennFaktor;//n_nenn_Faktor//n_nenn_factor
 	private String[] betrArt;
 	private double V_1_Toleranz_plus;
 	private double V_1_Toleranz_minus;
@@ -912,5 +912,13 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setBetrArt(String[] betrArt) {
 		this.betrArt = betrArt;
+	}
+
+	public double getnNominalFactor() {
+		return nNominalFactor;
+	}
+
+	public void setnNominalFactor(double nNominalFactor) {
+		this.nNominalFactor = nNominalFactor;
 	}
 }

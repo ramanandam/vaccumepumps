@@ -2499,8 +2499,15 @@ End Sub
 	 * 
 	 */
 
-	public static void machineSelection()
-	{
+	 
+
+
+	public static void machineSelection(ErrorCodeTable fehler, String machineID, String werkstoff_ID, double n,
+			double betr_art, double v_1_Gas_Total_Volume, double p_mech, String v_BF, int[] errorTypeSelection,
+			double v_1_Gas_gesamt_soll, double p_1, double p_2, double t_BF, double gas, double v_1_Gas_rel, double bF,
+			double v_1_F, double getnNominalFactor, int n_fest, double v_1_Toleranz_plus, double v_1_Toleranz_minus,
+			String ber_Grp) {
+		// TODO Auto-generated method stub
 		
 	}
 	
