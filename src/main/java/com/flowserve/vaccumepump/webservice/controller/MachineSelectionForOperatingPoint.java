@@ -1,5 +1,9 @@
 package com.flowserve.vaccumepump.webservice.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.flowserve.vaccumepump.webservice.dto.IVacuumPumpDetails;
 import com.flowserve.vaccumepump.webservice.dto.IVacuumSelectionInputs;
+import com.flowserve.vaccumepump.webservice.model.ErrorCodeTable;
+import com.flowserve.vaccumepump.webservice.util.FormUtil;
 
 @RestController
 public class MachineSelectionForOperatingPoint {
@@ -153,7 +159,93 @@ End Sub
 	//Button name :Maschinenauswahl für Betriebspunkt English : Machine selection for operating point
 	@RequestMapping(value = "/vaccumepumps/rest/machineSelectionForOperatingPoint/click", method = RequestMethod.POST)
 	public ResponseEntity<IVacuumPumpDetails> machineSelectionForOperatingPoint(@RequestBody IVacuumSelectionInputs input) {
-	
+		IVacuumPumpDetails respose = new IVacuumPumpDetails();
+		
+		
+		
+		respose.setV_1_Toleranz_plus(input.getV_1_Toleranz_plus()/100);
+		respose.setV_1_Toleranz_minus(input.getV_1_Toleranz_minus()/100);
+		if(input.isFreieDrehzahl50Hz())
+		{
+			respose.setnNominalFactor(1.0);
+		}else if(input.isFreieDrehzahl60Hz()) {
+			respose.setnNominalFactor(1.2);
+		}
+		
+		if (input.getStc_result() != 0 && input.getStcCalculationType() != 3) {
+			respose.setStc_V_1_Gas_gegeben(false);
+			respose.setStc_m_1_Gas_gegeben(false);
+			respose.setStc_m_1_Gas_gesamt_gegeben(false);
+			respose.setStc_m_1_Gas_rel_gegeben(false);
+			respose.setFields_filled(false);
+
+			int i = 0;
+			List<Double> V_1_Gas_rel_List = input.getV_1_Gas_rel_List();
+
+			for (Double value : V_1_Gas_rel_List) {
+				i++;
+				if (i > input.getStc_Number_of_Gases())
+					break;
+				if (value != null) {
+					respose.setFields_filled(true);
+				}
+			}
+
+			if (respose.isFields_filled()) {
+				respose.setStc_V_1_Gas_rel_gegeben(true);
+			}
+
+			respose.setStc_result(0);
+			respose.setStcCalculationType(3);
+
+			FormUtil.stc_new_mark();
+
+		}
+		
+		respose.setStc_Makro_Berechnung(true);
+		Map<Integer,Double> gasMap=input.getGasMap();
+		
+		 Map<Integer,Double> V_1_Gas_relMap=input.getV_1_Gas_relMap();
+		
+		 // Processing gas components
+        List<Double> gasComponents = new ArrayList<>();
+        List<Double> v1GasRelComponents = new ArrayList<>();
+        
+        for (int i = 1; i <= 6; i++) {
+            Double gasValue = gasMap.get(i);
+            if (gasValue != null) {
+                gasComponents.add(gasValue);
+                if (respose.isStc_V_1_Gas_rel_gegeben()) {
+                    v1GasRelComponents.add(V_1_Gas_relMap.get(i));
+                }
+            } else {
+                break;
+            }
+        }
+    	ErrorCodeTable fehler = new ErrorCodeTable();
+		String machineID=input.getMachineID();
+				String  Werkstoff_ID=input.getMaterialID();
+				double n = Double.parseDouble((input.getVacuumOperation()));
+		double p_1=input.getP_1();
+		double p_2=input.getP_2();
+		double T_1=input.getT_1();
+		double T_BF=input.getT_BF();
+		double V_1_Gas_gesamt_soll=input.getV_1_Gas_gesamt_soll();
+		double  V_1_Gas_rel=input.getV_1_Gas_rel();
+		double V_1_Gas_Total_Volume=input.getV_1_Gas_Total_Volume(); ;
+		double Gas=input.getGas();
+		
+		double  BF=input.getBf();
+		double V_1_F=input.getV_1_F();
+		double T_BF_opt=input.getOptimizedBFtemperature();
+		String Berechtigungsgruppe=input.getPermissionGroup();
+		boolean felder_gefuellt=input.isFields_filled();
+		int stcCalculationType = 6;
+		double P_mech;
+       // Call Maschinenauswahl(Fehler, Maschinen_ID, Werkstoff_ID, n, betr_art, V_1_Gas_gesamt, P_mech, V_BF, Fehlerart_Auswahl, V_1_Gas_gesamt_soll, p_1, p_2, T_1, T_BF, Gas, V_1_Gas_rel, BF, V_1_F, n_nenn_Faktor, n_fest, V_1_Toleranz_plus, V_1_Toleranz_minus, Ber_Grp)
+        FormUtil.machineSelection(fehler,machineID,Werkstoff_ID,n,betrArt,V_1_Gas_Total_Volume,P_mech,input.getV_BF(),);
+		return ResponseEntity.ok().body(respose);
+		
 	}
 	
 	

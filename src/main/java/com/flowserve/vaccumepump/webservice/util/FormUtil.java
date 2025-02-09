@@ -2137,7 +2137,371 @@ End Sub
 	{
 		
 	}
-
 	
+	
+	/*
+	 * 
+	 * Public Sub Maschinenauswahl(Fehler As Fehlercodetyp, Maschinen_ID_Auswahl, Werkstoff_ID_Auswahl, n_Auswahl, betr_art_Auswahl, _
+                            V_1_Gas_Auswahl, P_mech_Auswahl, V_BF_Auswahl, Fehlerart_Auswahl, V_1_Gas_soll, p_1, p_2, T_1, _
+                            T_BF, Gas, V_1_Gas_rel, BF, V_1_F, n_nenn_Faktor, n_fest, V_1_Toleranz_plus, V_1_Toleranz_minus, _
+                            Ber_Grp)
+
+' -----------------------------------------------------------------------------------------------
+' Diese Funktion sucht zu einem vorgegebenen Betriebspunkt die in Frage kommenden Maschinen und
+' gibt die zugehörigen Maschinen_IDs, Werkstoff_IDs und Drehzahlen, Betriebsarten, Gasvolumenströme,
+' Leistungsaufnahmen, Betriebsflüssigkeitsströme als Arrays zurück. Bei Fehlern bzw. Warnungen wird die
+' kritischste Fehlerart (kleinster Zahlenwert der Fehlerarten aller aufgetretenen Fehler) der jeweiligen
+' ausgewählten Maschinen im Array Fehlerart_Auswahl ausgegeben.
+'
+' Ein- und Ausgabeparameter
+'   Fehler
+'
+' Ausgabeparameter
+'   Maschinen_ID_Auswahl            Maschinen-IDs der in Frage kommenden Maschinen (als Array)
+'   Werkstoff_ID_Auswahl            Werkstoff-IDs der in Frage kommenden Maschinen (als Array)
+'   n_Auswahl                       Drehzahlen für die in Frage kommenden Maschinen [U/min] (als Array)
+'   betr_art_Auswahl                Betriebsart 1: Vakuumpumpe, 2: Kompressor (als Array)
+'   V_1_Gas_Auswahl                 Gesamt-Gasvolumenstrom der in Frage kommenden Maschinen [m³/h] (als Array)
+'   P_mech_Auswahl                  Leistungsaufnahme der in Frage kommenden Maschinen [kW] (als Array)
+'   V_BF_Auswahl                    Betriebsflüssigkeitsvolumenstrom der in Frage kommenden Maschinen [m³/h] (als Array)
+'   Fehlerart_Auswahl               Niedrigster Fehlerart-Wert (d.h. kritischste Fehlerart), die im Zusammenhang
+'                                   mit der jeweiligen Maschine auftritt (als Array)
+' Eingabgeparameter
+'   V_1_Gas_soll (obligatorisch)    Soll-Gesamt-Gasvolumenstrom am Saugstutzen
+'   p_1                             Ansaugdruck [mbar]
+'   p_2                             Verdichtungsdruck [mbar]
+'   T_1                             Gastemperatur am Saugstutzen [°C]
+'   T_BF                            Temperatur der Betriebsflüssigkeit [°C]
+'   Gas                             Stoff_IDs der Gase (als Array)
+'   V_1_Gas_rel                     relative Volumenstromverteilung der Gase am Saugstutzen (als Array) [-]
+'   BF                              Stoff_ID der Betriebsflüssigkeit
+'   V_1_F                           Volumenstrom der mitgeförderten Flüssigkeit [m³/h]
+'   n_nenn_Faktor                   Sollen nur Nenndrehzahlen und bzw. deren Vielfache berücksichtigt werden ?
+'                                   - für 50Hz --> n_nenn_Faktor = 1
+'                                   - für 60Hz --> n_nenn_Faktor = 1.2
+'                                   - für beliebige Drehzahlen --> n_nenn_Faktor = empty
+'   n_fest                          Vorgabe einer festen Drehzahl [U/min] (als Alternative zu n_nenn_Faktor)
+'                                   Wenn sowohl n_nenn_Faktor als auch n_fest leer sind, werden die passenden Drehzahlen interpoliert
+'   V_1_Toleranz_plus               Toleranz nach oben (+) für Volumenstrom (relativ 0...1) [-]
+'   V_1_Toleranz_minus              Toleranz nach unten (-) für Volumenstrom (relativ 0...1) [-]
+'   Ber_Grp                         Nutzer-Berechtigungsgruppe für Stoffdaten [-]
+'
+' -----------------------------------------------------------------------------------------------
+
+Dim Fehler_intern As Fehlercodetyp
+Dim Fehler_leer As Fehlercodetyp
+
+Dim Maschinendaten As Maschinendatentyp
+
+Dim M_ID, W_ID
+Dim betr_art As Integer
+Dim lambda, lambda_ges
+Dim phi_ges
+Dim n_such
+
+Dim col_M_ID As Integer, col_wkst As Integer, col_art As Integer, col_nn As Integer, col_betr_art As Integer
+Dim col_nl As Integer, col_px As Integer, col_sl As Integer, col_pl As Integer, col_fb As Integer
+Dim col_d_a As Integer, col_geom As Integer, col_n_max As Integer, col_E_Zahl_A As Integer, col_E_Zahl_B As Integer
+Dim col_p2_max As Integer, col_dp_min As Integer, col_dp_max As Integer, col_t3_max As Integer, col_t3_min
+Dim col_t1_min As Integer, col_t1t_max As Integer, col_t1f_max As Integer
+
+Dim p_SD_Gas_T_1, p_SD_Gas_T_BF
+Dim p_SD_BF_T_1, p_SD_BF_T_BF
+Dim p_SD_Dampf, Psi, Rel_Feuchte
+Dim rho_BF, ny_BF, c_BF, r_BF
+Dim M_mol_Gas, M_mol_BF
+Dim r_Gas, cp_Gas
+Dim Loes
+
+Dim T_BF_misch
+
+
+Dim Fehlerart_kritisch_intern                         ' kritischste Fehlerart (d.h. Fehlerart mit der kleinsten Zahl),
+                                                      ' der Fehlervariable Fehler_intern. - deckt die möglichen Fehler
+                                                      ' der jeweiligen in Frage kommenden Maschine ab, die durch die
+                                                      ' Berechnung der Korrekturfaktoren lambda und phi auftreten können
+
+Dim Fehlerart_kritisch_allgemein                      ' kritischste Fehlerart der allgemeinen Fehlervariable Fehler.
+                                                      ' deckt die möglichen Fehler ab, die durch die Löslichkeitsberechnung
+                                                      ' und Gasstromumrechnung ganz am Anfang auftreten können
+
+Dim Maschinentabelle As Worksheet
+Dim Listenwerttabelle As Worksheet
+Dim dataset_row
+Dim i As Integer, j As Integer, k As Integer
+
+Dim V_1_Liste, P_mech_Liste, V_BF_Liste
+Dim V_1_Gas_gesamt, P_mech, V_BF
+Dim n_Liste_i, p_x_j, V_1_Liste_ij
+Dim p_x As Double
+Dim n_interpoliert
+Dim P_mech_Liste_ij, V_BF_Liste_ij
+Dim V_1_Liste_alpha, P_Liste_alpha, V_BF_Liste_alpha  ' Koeffizientenarrays für bikubische Interpolation
+Dim V_1_inert_rel_ges
+Dim extrapolationsfaktor
+
+Dim t1 As Single   ' Benchmark
+t1 = Timer
+
+If Fehler.Abbruch Then Exit Sub
+
+' Leere Variablen mit Standardwerten belegen
+If IsEmpty(p_1) Or IsError(p_1) Then p_1 = 1013
+If IsEmpty(p_2) Or IsError(p_2) Then p_2 = 1013
+If IsEmpty(T_1) Or IsError(T_1) Then T_1 = 20
+If IsEmpty(T_BF) Or IsError(T_BF) Then T_BF = 15
+
+If IsEmpty(Gas) Then
+    Call Fehlercode_zufuegen(Fehler, 233)
+    Fehler.Abbruch = True
+End If
+If IsEmpty(BF) Then
+    Call Fehlercode_zufuegen(Fehler, 232)
+    Fehler.Abbruch = True
+End If
+
+Call Pruefung_Eingabeparameter(Fehler, Empty, p_1, p_2, T_1, T_BF, n_nenn_Faktor, n_fest, Empty, V_1_F, V_1_Gas_rel, Ber_Grp, Empty, Empty)
+If IsEmpty(V_1_Gas_soll) Or V_1_Gas_soll <= 0 Or (Not IsNumeric(V_1_Gas_soll)) Then
+    Call Fehlercode_zufuegen(Fehler, 218)
+    Fehler.Abbruch = True
+End If
+
+If Fehler.Abbruch Then Exit Sub
+
+betr_art = Betriebsart(p_1)
+
+Call Stoffdaten_ist_Gas(Fehler, Gas, T_1, Empty, T_BF, Ber_Grp, p_SD_Gas_T_1, Empty, p_SD_Gas_T_BF, cp_Gas, r_Gas, M_mol_Gas)
+Call Stoffdaten_ist_BF(Fehler, BF, T_1, Empty, T_BF, Ber_Grp, p_SD_BF_T_1, Empty, p_SD_BF_T_BF, c_BF, r_BF, rho_BF, ny_BF, M_mol_BF)
+Call Loeslichkeit_berechnen(Fehler, Gas, BF, T_BF, Loes)
+If Fehler.Abbruch Then Exit Sub
+
+If IsEmpty(p_SD_BF_T_BF) Then
+    Call Fehlercode_zufuegen(Fehler, 376)
+    Fehler.Abbruch = True
+End If
+
+If IsEmpty(rho_BF) Then 'Falls keine Dichte der Betriebsflüssigkeit verfügbar ist, wird die von Wasser angenommen
+    rho_BF = 1000
+    Call Fehlercode_zufuegen(Fehler, 377)
+End If
+
+If IsEmpty(ny_BF) Then 'Falls keine Viskosität der Betriebsflüssigkeit verfügbar ist, wird die von Wasser angenommen
+    ny_BF = 1
+    Call Fehlercode_zufuegen(Fehler, 378)
+End If
+
+If ny_BF > 60 Then
+    Call Fehlercode_zufuegen(Fehler, 364)
+ElseIf ny_BF > 15 Then
+    Call Fehlercode_zufuegen(Fehler, 363)
+End If
+
+' Folgende Funktion wird nur aufgerufen, um p_SD_Dampf, Psi und V_1_inert_rel_ges zu ermitteln
+Call Umrechnung_Gasstroeme(Fehler, Empty, Empty, V_1_Gas_rel, Empty, Empty, Empty, p_1, T_1, T_BF, Gas, Ber_Grp, p_SD_Dampf, Psi, Empty, Empty, Empty, V_1_inert_rel_ges, Rel_Feuchte, p_2, False, BF, Empty, Empty)
+Fehlerart_kritisch_allgemein = Fehlerart_kritisch(Fehler)
+
+If IsEmpty(V_1_inert_rel_ges) Then V_1_inert_rel_ges = 1
+
+' Folgende Funktion wird aufgerufen, um maschinenunabhängig Korrekturfaktoren zu berechnen und entsprechende Fehlercodes zu sammeln,
+' um dem Nutzer mögliche Ursachen aufzuzeigen, falls keine (fehlerfrei betreibbare) Maschinen bei der Suche gefunden werden
+Call Berechne_Lambda(Fehler, Empty, Empty, p_1, p_2, p_SD_Dampf, Psi, T_1, T_BF, V_1_Gas_rel, Empty, ny_BF, rho_BF, p_SD_BF_T_BF, Loes, V_1_F, M_mol_Gas, Maschinendaten, Empty, Empty, betr_art, Rel_Feuchte, Empty, Empty, Empty)
+' Prüfung, ob bei p_1 < 400mbar Flüssigkeit mitgefördert wird. Wenn ja wird eine Warnung generiert, da
+' keine Maschinen (ohne Warnungen) gefunden werden können.
+If V_1_F > 0 And p_1 < 400 Then Call Fehlercode_zufuegen(Fehler, 362)
+
+Set Listenwerttabelle = Worksheets("Listenwerttabelle")
+
+col_M_ID = Listenwerttabelle.Rows(1).Find("TYP", , , xlWhole).Column
+col_wkst = Listenwerttabelle.Rows(1).Find("WKST").Column
+col_art = Listenwerttabelle.Rows(1).Find("Maschinenart").Column
+col_nl = Listenwerttabelle.Rows(1).Find("NL").Column
+col_px = Listenwerttabelle.Rows(1).Find("PX").Column
+col_sl = Listenwerttabelle.Rows(1).Find("SL").Column
+col_pl = Listenwerttabelle.Rows(1).Find("PL").Column
+col_fb = Listenwerttabelle.Rows(1).Find("FB").Column
+col_betr_art = Listenwerttabelle.Rows(1).Find("Betriebsart").Column
+col_nn = Listenwerttabelle.Rows(1).Find("NN").Column
+col_d_a = Listenwerttabelle.Rows(1).Find("RADDU").Column
+col_geom = Listenwerttabelle.Rows(1).Find("GEOM").Column
+col_n_max = Listenwerttabelle.Rows(1).Find("NMAX").Column
+col_E_Zahl_A = Listenwerttabelle.Rows(1).Find("EZAHLA").Column
+col_E_Zahl_B = Listenwerttabelle.Rows(1).Find("EZAHLB").Column
+col_p2_max = Listenwerttabelle.Rows(1).Find("P2MAX").Column
+col_dp_min = Listenwerttabelle.Rows(1).Find("DPMIN").Column
+col_dp_max = Listenwerttabelle.Rows(1).Find("DPMAX").Column
+col_t3_min = Listenwerttabelle.Rows(1).Find("T3MIN").Column
+col_t3_max = Listenwerttabelle.Rows(1).Find("T3MAX").Column
+col_t1_min = Listenwerttabelle.Rows(1).Find("T1MIN").Column
+col_t1t_max = Listenwerttabelle.Rows(1).Find("T1TMAX").Column
+col_t1f_max = Listenwerttabelle.Rows(1).Find("T1FMAX").Column
+
+dataset_row = CONST_dataset_row_start
+Do
+    Fehler_intern = Fehler_leer
+    
+    Maschinendaten.Art = Listenwerttabelle.Cells(dataset_row, col_art)
+    Maschinendaten.b__d_a = Listenwerttabelle.Cells(dataset_row, col_geom)
+    Maschinendaten.d_a = Listenwerttabelle.Cells(dataset_row, col_d_a)
+    Maschinendaten.Delta_p_max = Listenwerttabelle.Cells(dataset_row, col_dp_max)
+    Maschinendaten.Delta_p_min = Listenwerttabelle.Cells(dataset_row, col_dp_min)
+    Maschinendaten.E_Zahl_A = Listenwerttabelle.Cells(dataset_row, col_E_Zahl_A)
+    Maschinendaten.E_Zahl_B = Listenwerttabelle.Cells(dataset_row, col_E_Zahl_B)
+    Maschinendaten.n_max = Listenwerttabelle.Cells(dataset_row, col_n_max)
+    Maschinendaten.n_nenn = Listenwerttabelle.Cells(dataset_row, col_nn)
+    Maschinendaten.p_2_max = Listenwerttabelle.Cells(dataset_row, col_p2_max)
+    Maschinendaten.T_1_min = Listenwerttabelle.Cells(dataset_row, col_t1_min)
+    Maschinendaten.T_1F_max = Listenwerttabelle.Cells(dataset_row, col_t1f_max)
+    Maschinendaten.T_3_min = Listenwerttabelle.Cells(dataset_row, col_t3_min)
+    Maschinendaten.T_3_max = Listenwerttabelle.Cells(dataset_row, col_t3_max)
+
+    ' Kennfeldmatrix bei der Maschine ab dataset_row zusammenbauen und in Sub-internen Static-Variablen speichern
+    Call Kennfeldmatrix(Fehler_intern, M_ID, W_ID, betr_art, n_Liste_i, p_x_j, V_1_Liste_ij, P_mech_Liste_ij, V_BF_Liste_ij, dataset_row)
+
+    If Not (IsEmpty(M_ID) Or Fehler_intern.Abbruch) Then
+        Call Bikubische_Koeffzienten_Listendaten(M_ID, W_ID, betr_art, n_Liste_i, p_x_j, V_1_Liste_ij, P_mech_Liste_ij, V_BF_Liste_ij, V_1_Liste_alpha, P_Liste_alpha, V_BF_Liste_alpha)
+        If Not IsEmpty(n_fest) Then
+            n_such = n_fest
+        ElseIf Not IsEmpty(n_nenn_Faktor) Then
+            n_such = Maschinendaten.n_nenn * n_nenn_Faktor
+        Else
+            n_such = Empty
+        End If
+        
+        If Not IsEmpty(n_such) Then
+            If betr_art = 1 Then
+                p_x = p_1
+            Else
+                p_x = p_2
+            End If
+
+            If Interpolation_bikubisch Then
+                V_1_Liste = bicubic_spline_interpolation(n_Liste_i, p_x_j, V_1_Liste_alpha, n_such, p_x, extrapolationsfaktor)
+                P_mech_Liste = bicubic_spline_interpolation(n_Liste_i, p_x_j, P_Liste_alpha, n_such, p_x)
+                V_BF_Liste = bicubic_spline_interpolation(n_Liste_i, p_x_j, V_BF_Liste_alpha, n_such, p_x)
+            Else
+                V_1_Liste = GetBilinearInterpolation(n_Liste_i, p_x_j, V_1_Liste_ij, CDbl(n_such), CDbl(p_x), extrapolationsfaktor)
+                P_mech_Liste = GetBilinearInterpolation(n_Liste_i, p_x_j, P_mech_Liste_ij, CDbl(n_such), CDbl(p_x), Empty)
+                V_BF_Liste = GetBilinearInterpolation(n_Liste_i, p_x_j, V_BF_Liste_ij, CDbl(n_such), CDbl(p_x), Empty)
+            End If
+            
+            If IsEmpty(extrapolationsfaktor) Or (extrapolationsfaktor < 0.2 And (betr_art = 2 Or (betr_art = 1 And (p_x >= p_x_j(1))))) Then
+                Call Berechne_Lambda(Fehler_intern, lambda_ges, Empty, p_1, p_2, p_SD_Dampf, Psi, T_1, T_BF, V_1_Gas_rel, n_such, ny_BF, rho_BF, p_SD_BF_T_BF, Loes, V_1_F, M_mol_Gas, Maschinendaten, M_ID, W_ID, betr_art, Rel_Feuchte, Empty, Empty, Empty)
+                V_1_Gas_gesamt = V_1_Liste * lambda_ges
+
+                If V_1_Gas_gesamt >= (1 - V_1_Toleranz_minus) * V_1_Gas_soll And V_1_Gas_gesamt <= (1 + V_1_Toleranz_plus) * V_1_Gas_soll Then
+                    
+                    Call Betriebspunkt(Fehler_intern, betr_art, CStr(M_ID), W_ID, n_such, p_1, p_2, T_1, T_BF, Gas, V_1_Gas_rel, BF, V_1_F, Ber_Grp, V_1_Gas_gesamt, P_mech, V_BF, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty)
+                    
+                    k = k + 1
+                    If k = 1 Then
+                        ReDim Maschinen_ID_Auswahl(1 To 1)
+                        ReDim Werkstoff_ID_Auswahl(1 To 1)
+                        ReDim n_Auswahl(1 To 1)
+                        ReDim betr_art_Auswahl(1 To 1)
+                        ReDim V_1_Gas_Auswahl(1 To 1)
+                        ReDim P_mech_Auswahl(1 To 1)
+                        ReDim V_BF_Auswahl(1 To 1)
+                        ReDim Fehlerart_Auswahl(1 To 1)
+                    Else
+                        ReDim Preserve Maschinen_ID_Auswahl(1 To k)
+                        ReDim Preserve Werkstoff_ID_Auswahl(1 To k)
+                        ReDim Preserve n_Auswahl(1 To k)
+                        ReDim Preserve betr_art_Auswahl(1 To k)
+                        ReDim Preserve V_1_Gas_Auswahl(1 To k)
+                        ReDim Preserve P_mech_Auswahl(1 To k)
+                        ReDim Preserve V_BF_Auswahl(1 To k)
+                        ReDim Preserve Fehlerart_Auswahl(1 To k)
+                    End If
+                    
+                    Maschinen_ID_Auswahl(k) = M_ID
+                    Werkstoff_ID_Auswahl(k) = W_ID
+                    n_Auswahl(k) = n_such
+                    betr_art_Auswahl(k) = betr_art
+                    V_1_Gas_Auswahl(k) = Round(V_1_Gas_gesamt)
+                    P_mech_Auswahl(k) = Round(P_mech, 2)
+                    V_BF_Auswahl(k) = Round(V_BF, 2)
+                    Fehlerart_kritisch_intern = Empty
+                    Fehlerart_kritisch_intern = Fehlerart_kritisch(Fehler_intern)
+                    If Not IsEmpty(Fehlerart_kritisch_allgemein) Then
+                        If IsEmpty(Fehlerart_kritisch_intern) Or (Fehlerart_kritisch_allgemein < Fehlerart_kritisch_intern) Then
+                            Fehlerart_kritisch_intern = Fehlerart_kritisch_allgemein
+                        End If
+                    End If
+                    Fehlerart_Auswahl(k) = Fehlerart_kritisch_intern
+                End If
+            End If
+        Else
+            If betr_art = 1 Then
+                p_x = p_1
+            Else
+                p_x = p_2
+            End If
+            
+            For i = 1 To UBound(n_Liste_i)
+                V_1_Liste = bicubic_spline_interpolation(n_Liste_i, p_x_j, V_1_Liste_alpha, n_Liste_i(i), p_x, extrapolationsfaktor)
+                If IsEmpty(extrapolationsfaktor) Or (extrapolationsfaktor < 0.2 And (betr_art = 2 Or (betr_art = 1 And (p_x >= p_x_j(1))))) Then
+                    Call Berechne_Lambda(Fehler_intern, lambda_ges, Empty, p_1, p_2, p_SD_Dampf, Psi, T_1, T_BF, V_1_Gas_rel, n_such, ny_BF, rho_BF, p_SD_BF_T_BF, Loes, V_1_F, M_mol_Gas, Maschinendaten, M_ID, W_ID, betr_art, Rel_Feuchte, Empty, Empty, Empty)
+                    V_1_Gas_gesamt = V_1_Liste * lambda_ges
+    
+                    If V_1_Gas_gesamt >= (1 - V_1_Toleranz_minus) * V_1_Gas_soll And V_1_Gas_gesamt <= (1 + V_1_Toleranz_plus) * V_1_Gas_soll Then
+                        
+                        Call Betriebspunkt(Fehler_intern, betr_art, CStr(M_ID), W_ID, n_Liste_i(i), p_1, p_2, T_1, T_BF, Gas, V_1_Gas_rel, BF, V_1_F, Ber_Grp, V_1_Gas_gesamt, P_mech, V_BF, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty, Empty)
+                        
+                        k = k + 1
+                        If k = 1 Then
+                            ReDim Maschinen_ID_Auswahl(1 To 1)
+                            ReDim Werkstoff_ID_Auswahl(1 To 1)
+                            ReDim n_Auswahl(1 To 1)
+                            ReDim betr_art_Auswahl(1 To 1)
+                            ReDim V_1_Gas_Auswahl(1 To 1)
+                            ReDim P_mech_Auswahl(1 To 1)
+                            ReDim V_BF_Auswahl(1 To 1)
+                            ReDim Fehlerart_Auswahl(1 To 1)
+                        Else
+                            ReDim Preserve Maschinen_ID_Auswahl(1 To k)
+                            ReDim Preserve Werkstoff_ID_Auswahl(1 To k)
+                            ReDim Preserve n_Auswahl(1 To k)
+                            ReDim Preserve betr_art_Auswahl(1 To k)
+                            ReDim Preserve V_1_Gas_Auswahl(1 To k)
+                            ReDim Preserve P_mech_Auswahl(1 To k)
+                            ReDim Preserve V_BF_Auswahl(1 To k)
+                            ReDim Preserve Fehlerart_Auswahl(1 To k)
+                        End If
+                        
+                        Maschinen_ID_Auswahl(k) = M_ID
+                        Werkstoff_ID_Auswahl(k) = W_ID
+                        n_Auswahl(k) = n_Liste_i(i)
+                        betr_art_Auswahl(k) = betr_art
+                        V_1_Gas_Auswahl(k) = Round(V_1_Gas_gesamt)
+                        P_mech_Auswahl(k) = Round(P_mech, 2)
+                        V_BF_Auswahl(k) = Round(V_BF, 2)
+                        Fehlerart_kritisch_intern = Empty
+                        Fehlerart_kritisch_intern = Fehlerart_kritisch(Fehler_intern)
+                        If Not IsEmpty(Fehlerart_kritisch_allgemein) Then
+                            If IsEmpty(Fehlerart_kritisch_intern) Or (Fehlerart_kritisch_allgemein < Fehlerart_kritisch_intern) Then
+                                Fehlerart_kritisch_intern = Fehlerart_kritisch_allgemein
+                            End If
+                        End If
+                        Fehlerart_Auswahl(k) = Fehlerart_kritisch_intern
+                    End If
+                End If
+            Next i
+        End If
+    End If
+    
+Loop Until IsEmpty(dataset_row)
+
+Call Fehler_doppelt_entfernen(Fehler)
+'MsgBox (Timer - t1)    ' Benchmark
+
+End Sub
+	 * 
+	 * 
+	 */
+
+	public static void machineSelection()
+	{
+		
+	}
 	
 }

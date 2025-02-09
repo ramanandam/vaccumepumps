@@ -2,10 +2,16 @@
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class IVacuumSelectionInputs implements Serializable{
 
+	private String[] betrArt;
+	private double V_1_Toleranz_plus;
+	private double V_1_Toleranz_minus;
+	
 	private int stc_Number_of_Gases=10;//Expect this is as a contact value set ..already ..stc_Anzahl_Gase
 	private boolean stc_V_1_Gas_rel_gegeben=false;//Constat value set already ..need to update through logic 
 	private String machineID;
@@ -40,7 +46,14 @@ public class IVacuumSelectionInputs implements Serializable{
 	private double delta_p_Waermetauscher;
 	//Delta_p_Waermetauscher [mbar]
 	private double gas;//Gas (Stoff_ID)
+	
+	private Map<Integer,Double> gasMap=new HashMap<>();//Formular_Gas_1,Formular_Gas_2,Formular_Gas_3...
+	
 	private double 	V_1_Gas_rel;//Formular_V_1_Gas_rel_1....
+	private Map<Integer,Double> V_1_Gas_relMap=new HashMap<>();
+	
+	
+	
 	
 	List<Double> V_1_Gas_rel_List=new ArrayList<>();	//Consider all the valuues are added in UI like Formular_V_1_Gas_rel_1,Formular_V_1_Gas_rel_2.....
 	
@@ -859,5 +872,45 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setStc_V_1_Gas_rel_gegeben(boolean stc_V_1_Gas_rel_gegeben) {
 		this.stc_V_1_Gas_rel_gegeben = stc_V_1_Gas_rel_gegeben;
+	}
+
+	public double getV_1_Toleranz_plus() {
+		return V_1_Toleranz_plus;
+	}
+
+	public void setV_1_Toleranz_plus(double v_1_Toleranz_plus) {
+		V_1_Toleranz_plus = v_1_Toleranz_plus;
+	}
+
+	public double getV_1_Toleranz_minus() {
+		return V_1_Toleranz_minus;
+	}
+
+	public void setV_1_Toleranz_minus(double v_1_Toleranz_minus) {
+		V_1_Toleranz_minus = v_1_Toleranz_minus;
+	}
+
+	public Map<Integer, Double> getGasMap() {
+		return gasMap;
+	}
+
+	public void setGasMap(Map<Integer, Double> gasMap) {
+		this.gasMap = gasMap;
+	}
+
+	public Map<Integer, Double> getV_1_Gas_relMap() {
+		return V_1_Gas_relMap;
+	}
+
+	public void setV_1_Gas_relMap(Map<Integer, Double> v_1_Gas_relMap) {
+		V_1_Gas_relMap = v_1_Gas_relMap;
+	}
+
+	public String[] getBetrArt() {
+		return betrArt;
+	}
+
+	public void setBetrArt(String[] betrArt) {
+		this.betrArt = betrArt;
 	}
 }

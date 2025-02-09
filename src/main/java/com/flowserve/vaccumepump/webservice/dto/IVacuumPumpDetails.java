@@ -8,7 +8,12 @@ import com.flowserve.vaccumepump.webservice.model.SubstanceNameTable;
 
 public class IVacuumPumpDetails implements Serializable {
 
-	private int stcCalculationType;//stcBerechnungsart
+	
+	private double V_1_Toleranz_plus;
+	private double V_1_Toleranz_minus;
+	private double nNominalFactor;//nNennFaktor;
+	
+	private int stcCalculationType;//stc_Berechnungsart
 	private boolean stc_V_1_Gas_rel_gegeben=false;//Constat value set already ..need to update through logic
 	private List<String> machineIdList;
 	private String machineType;
@@ -142,7 +147,7 @@ private boolean stc_V_1_Gas_gegeben;
 	private boolean stc_m_1_Gas_gesamt_gegeben;
 	private boolean stc_m_1_Gas_rel_gegeben;
 	
-	private boolean fields_filled;
+	private boolean fields_filled;//felder_gefuellt
 	 
 
 	public String getMachineType() {
@@ -851,6 +856,30 @@ private boolean stc_V_1_Gas_gegeben;
 
 	public void setStcCalculationType(int stcCalculationType) {
 		this.stcCalculationType = stcCalculationType;
+	}
+
+	public double getnNominalFactor() {
+		return nNominalFactor;
+	}
+
+	public void setnNominalFactor(double nNominalFactor) {
+		this.nNominalFactor = nNominalFactor;
+	}
+
+	public double getV_1_Toleranz_plus() {
+		return V_1_Toleranz_plus;
+	}
+
+	public void setV_1_Toleranz_plus(double v_1_Toleranz_plus) {
+		V_1_Toleranz_plus = v_1_Toleranz_plus;
+	}
+
+	public double getV_1_Toleranz_minus() {
+		return V_1_Toleranz_minus;
+	}
+
+	public void setV_1_Toleranz_minus(double v_1_Toleranz_minus) {
+		V_1_Toleranz_minus = v_1_Toleranz_minus;
 	}
 
 }
