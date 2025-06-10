@@ -2511,4 +2511,348 @@ End Sub
 		
 	}
 	
+	
+	/*
+	 * Sub stc_neu_markieren()
+
+Dim ergebnis_darstellung_eingabe As Integer
+Dim ergebnis_darstellung_eingabe_variabel As Integer
+Dim ergebnis_darstellung_ausgabe As Integer
+Dim rgb_eingabe As Long
+Dim rgb_ausgabe As Long
+
+Static stc_Berechnungsart_alt As Integer
+Static stc_Ergebnis_alt As Integer
+
+If stc_Berechnungsart <> stc_Berechnungsart_alt Then
+    ComboBox_Maschinen_ID.BackColor = RGB(255, 255, 255)
+    ListBox_Wkst.BackColor = RGB(255, 255, 255)
+    ComboBox_Gasstrahler.BackColor = RGB(255, 255, 255)
+    ListBox_Gasstrahlerauswahl.BackColor = RGB(255, 255, 255)
+    ListBox_Maschinenauswahl_Evak.BackColor = RGB(255, 255, 255)
+
+    Call stc_einfaerben(Application.Names("Formular_Berechtigungsgruppe").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Drehzahl").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_p_1").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_p_2").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_T_1").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_T_BF").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_F").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_T_FF").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_BF").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_BF_manuell").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Delta_p_Waermetauscher").RefersToRange, 0)
+    
+    Call stc_einfaerben(Application.Names("Formular_Gas").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_norm").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_rel").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_rel").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Feuchte").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Psi").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_p_SD_Dampf").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_M_mol_mittel").RefersToRange, 0)
+    
+    Call stc_einfaerben(Application.Names("Formular_P").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_P_max").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_p_2_max").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_BF").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Q_WT").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_T_2").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_FF").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_lambdas").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_phis").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_n_ref").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_p_2_ref").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_ref").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_P_ref").RefersToRange, 0)
+
+    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_soll").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_Toleranz_plus").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_Toleranz_minus").RefersToRange, 0)
+    
+    Call stc_einfaerben(Application.Names("Formular_V_Behaelter").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_p_1_Beginn").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_p_1_Ende").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_V_1_norm_Leckage").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Evakuierungszeit").RefersToRange, 0)
+    
+    Call stc_einfaerben(Application.Names("Formular_Soll_Evakuierungszeit").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_t_evak_Toleranz_plus").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_t_evak_Toleranz_minus").RefersToRange, 0)
+    
+    Call stc_einfaerben(Application.Names("Formular_Gasstrahler_p_1").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Gasstrahler_V_1").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Gasstrahler_V_Treibstrom").RefersToRange, 0)
+    Call stc_einfaerben(Application.Names("Formular_Gasstrahler_V_1_soll").RefersToRange, 0)
+
+    Call stc_einfaerben(Application.Names("Formular_T_BF_opt").RefersToRange, 0)
+End If
+
+If stc_Ergebnis = 0 Then
+    ergebnis_darstellung_eingabe = 4
+    ergebnis_darstellung_eingabe_variabel = 3
+    ergebnis_darstellung_ausgabe = 1
+    rgb_eingabe = RGB(255, 255, 0)
+    rgb_ausgabe = RGB(255, 255, 255)
+    If stc_Ergebnis_alt <> 0 Then TextBox_Fehler = Empty
+ElseIf stc_Ergebnis = 1 Then
+    ergebnis_darstellung_eingabe = 5
+    ergebnis_darstellung_eingabe_variabel = 5
+    ergebnis_darstellung_ausgabe = 5
+    rgb_eingabe = RGB(180, 255, 180)
+    rgb_ausgabe = RGB(180, 255, 180)
+ElseIf stc_Ergebnis = -1 Then
+    ergebnis_darstellung_eingabe = 6
+    ergebnis_darstellung_eingabe_variabel = 6
+    ergebnis_darstellung_ausgabe = 6
+    rgb_eingabe = RGB(255, 180, 180)
+    rgb_ausgabe = RGB(255, 180, 180)
+End If
+
+If stc_Berechnungsart <> stc_Berechnungsart_alt Or stc_Ergebnis <> stc_Ergebnis_alt Then
+    If stc_Berechnungsart = 1 Then
+        Call stc_einfaerben(Application.Names("Formular_Berechtigungsgruppe").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_BF").RefersToRange, ergebnis_darstellung_eingabe)
+    ElseIf stc_Berechnungsart = 2 Then
+        ComboBox_Maschinen_ID.BackColor = rgb_eingabe
+        ListBox_Wkst.BackColor = rgb_eingabe
+        Call stc_einfaerben(Application.Names("Formular_Berechtigungsgruppe").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_Drehzahl").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_F").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_FF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_BF_manuell").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_Delta_p_Waermetauscher").RefersToRange, ergebnis_darstellung_eingabe)
+        
+        Call stc_einfaerben(Application.Names("Formular_P").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_P_max").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2_max").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_V_BF").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_Q_WT").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_T_2").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_V_FF").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_lambdas").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_phis").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_n_ref").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2_ref").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_ref").RefersToRange, ergebnis_darstellung_ausgabe)
+        Call stc_einfaerben(Application.Names("Formular_P_ref").RefersToRange, ergebnis_darstellung_ausgabe)
+
+    ElseIf stc_Berechnungsart = 3 Then
+        Call stc_einfaerben(Application.Names("Formular_Berechtigungsgruppe").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_F").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_soll").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_Toleranz_plus").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_Toleranz_minus").RefersToRange, ergebnis_darstellung_eingabe)
+        
+        'Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, 0)
+        'Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, 0)
+        'Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, 0)
+        'Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_norm").RefersToRange, 0)
+        'Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, 0)
+
+    ElseIf stc_Berechnungsart = 4 Then
+        ComboBox_Maschinen_ID.BackColor = rgb_eingabe
+        ListBox_Wkst.BackColor = rgb_eingabe
+        Call stc_einfaerben(Application.Names("Formular_Berechtigungsgruppe").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_Drehzahl").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1_Beginn").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1_Ende").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_Behaelter").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_norm_Leckage").RefersToRange, ergebnis_darstellung_eingabe)
+        
+        Call stc_einfaerben(Application.Names("Formular_Evakuierungszeit").RefersToRange, ergebnis_darstellung_ausgabe)
+    ElseIf stc_Berechnungsart = 5 Then
+        Call stc_einfaerben(Application.Names("Formular_Berechtigungsgruppe").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1_Beginn").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1_Ende").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_Behaelter").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_Soll_Evakuierungszeit").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_t_evak_Toleranz_plus").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_t_evak_Toleranz_minus").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_norm_Leckage").RefersToRange, ergebnis_darstellung_eingabe)
+    
+        ListBox_Maschinenauswahl_Evak.BackColor = rgb_ausgabe
+    ElseIf stc_Berechnungsart = 6 Then
+        Call stc_einfaerben(Application.Names("Formular_Berechtigungsgruppe").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_p_2").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_T_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_F").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_BF").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_soll").RefersToRange, ergebnis_darstellung_eingabe)
+        
+        Call stc_einfaerben(Application.Names("Formular_T_BF_opt").RefersToRange, ergebnis_darstellung_ausgabe)
+    ElseIf stc_Berechnungsart = 7 Then
+        ComboBox_Gasstrahler.BackColor = rgb_eingabe
+        Call stc_einfaerben(Application.Names("Formular_Gasstrahler_p_1").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_Gasstrahler_V_1").RefersToRange, ergebnis_darstellung_ausgabe)
+        
+        Call stc_einfaerben(Application.Names("Formular_Gasstrahler_V_Treibstrom").RefersToRange, ergebnis_darstellung_ausgabe)
+    ElseIf stc_Berechnungsart = 8 Then
+        ListBox_Gasstrahlerauswahl.BackColor = rgb_ausgabe
+        Call stc_einfaerben(Application.Names("Formular_Gasstrahler_V_1_soll").RefersToRange, ergebnis_darstellung_eingabe)
+        Call stc_einfaerben(Application.Names("Formular_Gasstrahler_p_1").RefersToRange, ergebnis_darstellung_eingabe)
+    End If
+    If stc_Ergebnis = -1 Then
+        TextBox_Fehler.BackColor = rgb_ausgabe
+    Else
+        TextBox_Fehler.BackColor = RGB(255, 255, 255)
+    End If
+End If
+
+If (stc_Berechnungsart > 0 And stc_Berechnungsart < 4) Or stc_Berechnungsart = 6 Then
+    If stc_Anzahl_Gase = 0 Then
+        Call stc_einfaerben(Application.Names("Formular_Gas").RefersToRange, 0)
+        Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, 0)
+        Call stc_einfaerben(Application.Names("Formular_V_1_Gas_rel").RefersToRange, 0)
+        Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, 0)
+        Call stc_einfaerben(Application.Names("Formular_m_1_Gas_rel").RefersToRange, 0)
+        Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, 0)
+        Call stc_einfaerben(Application.Names("Formular_Feuchte").RefersToRange, 0)
+        Call stc_einfaerben(Application.Names("Formular_Psi").RefersToRange, 0)
+        If stc_Berechnungsart < 3 Then
+            Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+            Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_norm").RefersToRange, ergebnis_darstellung_ausgabe)
+        End If
+    Else
+        If stc_Ergebnis <> 0 Then
+            If stc_Berechnungsart = 1 Or stc_Berechnungsart = 2 Then
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_norm").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_m_1_Gas_rel").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_Feuchte").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_Psi").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_p_SD_Dampf").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_M_mol_mittel").RefersToRange, ergebnis_darstellung_ausgabe)
+            End If
+            Call stc_einfaerben(Application.Names("Formular_Gas").RefersToRange, ergebnis_darstellung_ausgabe)
+            Call stc_einfaerben(Application.Names("Formular_V_1_Gas_rel").RefersToRange, ergebnis_darstellung_ausgabe)
+        Else
+            Call stc_einfaerben(Application.Names("Formular_Gas").RefersToRange, ergebnis_darstellung_eingabe)
+            If stc_V_1_Gas_rel_gegeben Then
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas_rel").RefersToRange, ergebnis_darstellung_eingabe_variabel)
+            Else
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas_rel").RefersToRange, ergebnis_darstellung_ausgabe)
+            End If
+            If stc_Berechnungsart = 1 Then
+                If stc_V_1_Gas_gegeben Then
+                    If CheckBox_saettigen.Value = True Then
+                        Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, ergebnis_darstellung_eingabe_variabel)
+                    Else
+                        Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, ergebnis_darstellung_eingabe)
+                    End If
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_m_1_Gas_rel_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_rel").RefersToRange, ergebnis_darstellung_eingabe_variabel)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_rel").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_m_1_Gas_gegeben Then
+                    If CheckBox_saettigen.Value = True Then
+                        Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, ergebnis_darstellung_eingabe_variabel)
+                    Else
+                        Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, ergebnis_darstellung_eingabe)
+                    End If
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_V_1_Gas_gesamt_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_eingabe)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_m_1_Gas_gesamt_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_eingabe)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                Call stc_einfaerben(Application.Names("Formular_Feuchte").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_Psi").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_p_SD_Dampf").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_M_mol_mittel").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_norm").RefersToRange, ergebnis_darstellung_ausgabe)
+            ElseIf stc_Berechnungsart = 2 Then
+                If stc_V_1_Gas_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, ergebnis_darstellung_eingabe_variabel)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_m_1_Gas_rel_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_rel").RefersToRange, ergebnis_darstellung_eingabe_variabel)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_rel").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_m_1_Gas_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, ergebnis_darstellung_eingabe_variabel)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_V_1_Gas_gesamt_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_eingabe)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+                    Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_norm").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                If stc_m_1_Gas_gesamt_gegeben Then
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_eingabe)
+                Else
+                    Call stc_einfaerben(Application.Names("Formular_m_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+                End If
+                Call stc_einfaerben(Application.Names("Formular_Feuchte").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_Psi").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_p_SD_Dampf").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_M_mol_mittel").RefersToRange, ergebnis_darstellung_ausgabe)
+            
+            
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt").RefersToRange, ergebnis_darstellung_ausgabe)
+                Call stc_einfaerben(Application.Names("Formular_V_1_Gas_gesamt_norm").RefersToRange, ergebnis_darstellung_ausgabe)
+            End If
+        End If
+    End If
+End If
+
+stc_Berechnungsart_alt = stc_Berechnungsart
+stc_Ergebnis_alt = stc_Ergebnis
+
+End Sub
+
+
+	 *  
+	 *  
+	 *  */
+	
+	public static void newMarkingOfTheStc()
+	{
+		
+	}
 }

@@ -149,7 +149,9 @@ private boolean stc_V_1_Gas_gegeben;
 	
 	private boolean fields_filled;//felder_gefuellt
 	 
+private int noOfRecords=0;//Formular_Anzahl_Datensätze
 
+private String[][] machineSelectionTextBox;//listBoxArray;//Listbox_Maschinenauswahl Text box 
 	public String getMachineType() {
 		return machineType;
 	}
@@ -880,6 +882,23 @@ private boolean stc_V_1_Gas_gegeben;
 
 	public void setV_1_Toleranz_minus(double v_1_Toleranz_minus) {
 		V_1_Toleranz_minus = v_1_Toleranz_minus;
+	}
+
+	public int getNoOfRecords() {
+		return noOfRecords;
+	}
+
+	public void setNoOfRecords(int noOfRecords) {
+		this.noOfRecords = noOfRecords;
+	}
+
+	
+	public String[][] getMachineSelectionTextBox() {
+		return machineSelectionTextBox;
+	}
+
+	public void setMachineSelectionTextBox(String[][] machineSelectionTextBox) {
+		this.machineSelectionTextBox = machineSelectionTextBox;
 	}
 
 }

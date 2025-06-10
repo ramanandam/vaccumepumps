@@ -183,7 +183,8 @@ private boolean stc_m_1_Gas_Total_Given;
 	private boolean stc_m_1_Gas_rel_gegeben;
 	
 	
-	 
+	private boolean selectionWithWarnings=false;//Auswahl_mit_Warnungen check box
+	
 	
 	
 	
@@ -920,5 +921,13 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setnNominalFactor(double nNominalFactor) {
 		this.nNominalFactor = nNominalFactor;
+	}
+
+	public boolean isSelectionWithWarnings() {
+		return selectionWithWarnings;
+	}
+
+	public void setSelectionWithWarnings(boolean selectionWithWarnings) {
+		this.selectionWithWarnings = selectionWithWarnings;
 	}
 }
