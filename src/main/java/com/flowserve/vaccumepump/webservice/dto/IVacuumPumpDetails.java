@@ -151,6 +151,8 @@ private boolean stc_V_1_Gas_gegeben;
 	 
 private int noOfRecords=0;//Formular_Anzahl_Datensätze
 
+private double bf;//Betriebsflüssigkeit (Formular_BF)
+
 private String[][] machineSelectionTextBox;//listBoxArray;//Listbox_Maschinenauswahl Text box 
 	public String getMachineType() {
 		return machineType;
@@ -899,6 +901,14 @@ private String[][] machineSelectionTextBox;//listBoxArray;//Listbox_Maschinenaus
 
 	public void setMachineSelectionTextBox(String[][] machineSelectionTextBox) {
 		this.machineSelectionTextBox = machineSelectionTextBox;
+	}
+
+	public double getBf() {
+		return bf;
+	}
+
+	public void setBf(double bf) {
+		this.bf = bf;
 	}
 
 }

@@ -14,12 +14,12 @@ public class IVacuumSelectionInputs implements Serializable{
 	
 	private int stc_Number_of_Gases=10;//Expect this is as a contact value set ..already ..stc_Anzahl_Gase
 	private boolean stc_V_1_Gas_rel_gegeben=false;//Constat value set already ..need to update through logic 
-	private String machineID;
+	private String machineID;//M_ID
 	private String materialID;//Werkstoff_ID
 	private String vacuumOperation;
 	private String compressorOperation;
 	private String permissionGroup;//Berechtigungsgruppe;
-	private double bf;//Betriebsflüssigkeit (Stoff_ID)
+	private double bf;//Betriebsflüssigkeit (Formular_BF)
 	private double p_1;
 	private double p_2;
 	private double T_1;
@@ -174,7 +174,7 @@ private boolean stc_m_1_Gas_Total_Given;
 	private boolean freieDrehzahl50Hz;// --> NN
 	private boolean isFreieDrehzahl;
 	
-	private boolean fields_filled;//felder_gefuellt;
+	private boolean fields_filled;//felder_gefuellt;felderGefuellt
 	private boolean stc_V_1_Gas_gegeben;
 	
 	private boolean stc_V_1_Gas_gesamt_gegeben;
@@ -185,9 +185,22 @@ private boolean stc_m_1_Gas_Total_Given;
 	
 	private boolean selectionWithWarnings=false;//Auswahl_mit_Warnungen check box
 	
+	private String V_Container;//Formular_V_Behaelter
+	private String p_1_Begin;//Formular_p_1_Beginn
+	private String p_1_End;//Formular_p_1_Ende
 	
+	private String V_1_norm_leakage;//Formular_V_1_norm_Leckage
+	private String Evacuation_Time;//Formular_Evakuierungszeit
 	
+	private long EvacuationTime_min;
+                                         //Evakuierungszeit [min]==Formular_Evakuierungszeit/60
 	
+	private String  Target_Evacuation_Time;
+//Formular_Soll_Evakuierungszeit
+	
+	private String t_evak_tolerance_plus;//Formular_t_evak_Toleranz_plus;
+	
+	private String Form_t_evak_tolerance_minus;//Formular_t_evak_Toleranz_minus
 	public String getMaterialID() {
 		return materialID;
 	}
@@ -929,5 +942,77 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setSelectionWithWarnings(boolean selectionWithWarnings) {
 		this.selectionWithWarnings = selectionWithWarnings;
+	}
+
+	public String getV_Container() {
+		return V_Container;
+	}
+
+	public void setV_Container(String v_Container) {
+		V_Container = v_Container;
+	}
+
+	public String getP_1_Begin() {
+		return p_1_Begin;
+	}
+
+	public void setP_1_Begin(String p_1_Begin) {
+		this.p_1_Begin = p_1_Begin;
+	}
+
+	public String getP_1_End() {
+		return p_1_End;
+	}
+
+	public void setP_1_End(String p_1_End) {
+		this.p_1_End = p_1_End;
+	}
+
+	public String getV_1_norm_leakage() {
+		return V_1_norm_leakage;
+	}
+
+	public void setV_1_norm_leakage(String v_1_norm_leakage) {
+		V_1_norm_leakage = v_1_norm_leakage;
+	}
+
+	public String getEvacuation_Time() {
+		return Evacuation_Time;
+	}
+
+	public void setEvacuation_Time(String evacuation_Time) {
+		Evacuation_Time = evacuation_Time;
+	}
+
+	public long getEvacuationTime_min() {
+		return EvacuationTime_min;
+	}
+
+	public void setEvacuationTime_min(long evacuationTime_min) {
+		EvacuationTime_min = evacuationTime_min;
+	}
+
+	public String getTarget_Evacuation_Time() {
+		return Target_Evacuation_Time;
+	}
+
+	public void setTarget_Evacuation_Time(String target_Evacuation_Time) {
+		Target_Evacuation_Time = target_Evacuation_Time;
+	}
+
+	public String getT_evak_tolerance_plus() {
+		return t_evak_tolerance_plus;
+	}
+
+	public void setT_evak_tolerance_plus(String t_evak_tolerance_plus) {
+		this.t_evak_tolerance_plus = t_evak_tolerance_plus;
+	}
+
+	public String getForm_t_evak_tolerance_minus() {
+		return Form_t_evak_tolerance_minus;
+	}
+
+	public void setForm_t_evak_tolerance_minus(String form_t_evak_tolerance_minus) {
+		Form_t_evak_tolerance_minus = form_t_evak_tolerance_minus;
 	}
 }
