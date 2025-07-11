@@ -1,6 +1,7 @@
 package com.flowserve.vaccumepump.webservice.dto;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -136,6 +137,7 @@ public class IVacuumPumpDetails implements Serializable {
 	List<String> comboBox_Gas_List;
 	Map<String,SubstanceNameTable> substanceNameTableMap;
 	
+	List<Double> V_1_Gas_rel = new ArrayList<>();
 	
 	private double P_2_max;
 	
@@ -154,6 +156,9 @@ private int noOfRecords=0;//Formular_Anzahl_Datensätze
 private double bf;//Betriebsflüssigkeit (Formular_BF)
 
 private String[][] machineSelectionTextBox;//listBoxArray;//Listbox_Maschinenauswahl Text box 
+
+
+private int  numberOfRecordsEvak;    //Formular_Anzahl_Datensätze_evak
 	public String getMachineType() {
 		return machineType;
 	}
@@ -909,6 +914,22 @@ private String[][] machineSelectionTextBox;//listBoxArray;//Listbox_Maschinenaus
 
 	public void setBf(double bf) {
 		this.bf = bf;
+	}
+
+	public List<Double> getV_1_Gas_rel() {
+		return V_1_Gas_rel;
+	}
+
+	public void setV_1_Gas_rel(List<Double> v_1_Gas_rel) {
+		V_1_Gas_rel = v_1_Gas_rel;
+	}
+
+	public int getNumberOfRecordsEvak() {
+		return numberOfRecordsEvak;
+	}
+
+	public void setNumberOfRecordsEvak(int numberOfRecordsEvak) {
+		this.numberOfRecordsEvak = numberOfRecordsEvak;
 	}
 
 }

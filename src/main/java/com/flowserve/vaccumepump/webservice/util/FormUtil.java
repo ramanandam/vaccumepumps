@@ -1,5 +1,7 @@
 package com.flowserve.vaccumepump.webservice.util;
 
+import java.util.List;
+
 import com.flowserve.vaccumepump.webservice.model.ErrorCodeTable;
 
 public class FormUtil {
@@ -2855,4 +2857,278 @@ End Sub
 	{
 		
 	}
+	
+	
+	/*
+	 * 
+	 * Maschinenauswahl_fuer_Evakuierungszeit
+	 * 
+	 * 
+	 * 
+	 * 
+	 * Public Sub Maschinenauswahl_fuer_Evakuierungszeit(Fehler As Fehlercodetyp, Maschinen_ID_Auswahl, Werkstoff_ID_Auswahl, _
+                                                  n_Auswahl, t_evak_Auswahl, Fehlerart_Auswahl, t_evak_soll, V_Behaelter, _
+                                                  p_1_Beginn, p_1_Ende, p_2, T_1, T_BF, V_1_norm_Leckage, _
+                                                  n_nenn_Faktor, t_evak_Toleranz_plus, t_evak_Toleranz_minus, Ber_Grp)
+
+' -----------------------------------------------------------------------------------------------
+' Diese Funktion sucht zu einer vorgegebenen Evakuierungszeit, einer Behältergröße,
+' Anfangs- und Enddruck sowie den übrigen Betriebsbedingungen passende Vakuumpumpen
+' und gibt die zugehörigen Maschinen_IDs, Werkstoff_IDs und Drehzahlen als Arrays zurück.
+' Es wird nur mit trockener Luft als Gas und Wasser als Betriebsflüssigkeit gerechnet.
+' Keine Flüssigkeitsmitförderung.
+' Bei Fehlern bzw. Warnungen wird die kritischste Fehlerart (kleinster Zahlenwert der Fehlerarten
+' aller aufgetretenen Fehler) der jeweiligen ausgewählten Maschinen im Array Fehlerart_Auswahl
+' ausgegeben.
+'
+' Ein- und Ausgabeparameter
+'   Fehler
+'
+' Ausgabeparameter
+'   Maschinen_ID_Auswahl            Maschinen-IDs der in Frage kommenden Vakuumpumpen (als Array)
+'   Werkstoff_ID_Auswahl            Werkstoff-IDs der in Frage kommenden Vakuumpumpen (als Array)
+'   n_Auswahl                       Drehzahlen für die in Frage kommenden Vakuumpumpen [U/min] (als Array)
+'   t_evak_Auswahl                  Evakuierungszeit der in Frage kommenden Vakuumpumpen [s] (als Array)
+'   Fehlerart_Auswahl               Niedrigster Fehlerart-Wert (d.h. kritischste Fehlerart), die im Zusammenhang
+'                                   mit der jeweiligen Vakuumpumpe auftritt (als Array)
+'
+' Eingabgeparameter
+'   t_evak_soll (obligatorisch)     Soll-Evakuierungszeit [s]
+'   V_Behaelter                     Zu evakuierendes Behältervolumen [m³]
+'   p_1_Beginn                      Ansaugdruck bei Beginn der Evakuierung [mbar]
+'   p_1_Ende                        Ansaugdruck bei Ende der Evakuierung [mbar]
+'   p_2                             Verdichtungsdruck [mbar]
+'   T_1                             Gastemperatur am Saugstutzen [°C]
+'   T_BF                            Temperatur der Betriebsflüssigkeit [°C]
+'   V_1_norm_Leckage                Normierter Leckageluftvolumenstrom [Nm³/h] (Normatmosphäre 1013mbar, 0°C)
+'   n_nenn_Faktor                   Multiplikator für die Nenndrehzahl der zu suchenden Maschine [-]
+'                                   - für 50Hz --> n_nenn_Faktor = 1
+'                                   - für 60Hz --> n_nenn_Faktor = 1.2
+'                                   - für beliebige Drehzahlen --> n_nenn_Faktor = empty
+'   t_evak_Toleranz_plus            Toleranz nach oben (+) für Volumenstrom (relativ 0...1) [-]
+'   t_evak_Toleranz_minus           Toleranz nach unten (-) für Volumenstrom (relativ 0...1) [-]
+'   Ber_Grp                         Nutzer-Berechtigungsgruppe für Stoffdaten [-]
+'
+' -----------------------------------------------------------------------------------------------
+
+Dim Fehler_intern As Fehlercodetyp
+Dim Fehler_leer As Fehlercodetyp
+
+Dim Maschinendaten As Maschinendatentyp
+
+Dim M_ID, W_ID
+Dim betr_art As Integer
+Dim n_such
+Dim t_evak
+Dim V_1_inert_rel_ges
+
+Dim col_M_ID As Integer, col_wkst As Integer, col_art As Integer, col_nn As Integer, col_betr_art As Integer
+Dim col_nl As Integer, col_px As Integer, col_sl As Integer, col_pl As Integer, col_fb As Integer
+Dim col_d_a As Integer, col_geom As Integer, col_n_max As Integer, col_E_Zahl_A As Integer, col_E_Zahl_B As Integer
+Dim col_p2_max As Integer, col_dp_min As Integer, col_dp_max As Integer, col_t3_max As Integer, col_t3_min
+Dim col_t1_min As Integer, col_t1t_max As Integer, col_t1f_max As Integer
+
+Dim p_SD_Gas_T_1, p_SD_Gas_T_BF
+Dim p_SD_BF_T_1, p_SD_BF_T_BF
+Dim p_SD_Dampf, Psi, Rel_Feuchte
+Dim rho_BF, ny_BF, c_BF, r_BF
+Dim M_mol_Gas, M_mol_BF
+Dim r_Gas, cp_Gas
+Dim Loes
+
+Dim Maschinentabelle As Worksheet
+Dim Listenwerttabelle As Worksheet
+Dim dataset_row
+Dim i As Integer
+Dim k As Integer
+
+Dim n_Liste_i, p_x_j, V_1_Liste_ij
+Dim P_mech_Liste_ij, V_BF_Liste_ij
+
+
+Dim t1 As Single   ' Benchmark
+t1 = Timer
+
+If Fehler.Abbruch Then Exit Sub
+
+If Not IsEmpty(p_1_Beginn) Then
+    If Not IsNumeric(p_1_Beginn) Or p_1_Beginn <= 0 Then
+        Call Fehlercode_zufuegen(Fehler, 214, "p_1_Beginn")
+        Fehler.Abbruch = True
+    End If
+End If
+If IsEmpty(p_1_Ende) Then
+    Call Fehlercode_zufuegen(Fehler, 219)
+    Fehler.Abbruch = True
+End If
+If Not IsNumeric(p_1_Ende) Or p_1_Ende <= 0 Then
+    Call Fehlercode_zufuegen(Fehler, 214, "p_1_Ende")
+    Fehler.Abbruch = True
+End If
+If Not IsEmpty(V_Behaelter) Then
+    If Not IsNumeric(V_Behaelter) Or V_Behaelter <= 0 Then
+        Call Fehlercode_zufuegen(Fehler, 214, "V_Behaelter")
+        Fehler.Abbruch = True
+    End If
+End If
+If Fehler.Abbruch Then Exit Sub
+
+' Leere Variablen mit Standardwerten belegen
+If IsEmpty(p_1_Beginn) Then p_1_Beginn = 1013
+If IsEmpty(p_2) Then p_2 = 1013
+If IsEmpty(T_1) Then T_1 = 20
+If IsEmpty(T_BF) Then T_BF = 15
+
+Call Pruefung_Eingabeparameter(Fehler, Empty, Empty, p_2, T_1, T_BF, n_nenn_Faktor, Empty, Empty, Empty, Empty, Ber_Grp, Empty, Empty)
+
+If p_2 < p_1_Beginn Then
+    Call Fehlercode_zufuegen(Fehler, 309)
+    Fehler.Abbruch = True
+End If
+
+If p_1_Ende > p_1_Beginn Then
+    Call Fehlercode_zufuegen(Fehler, 213)
+    Fehler.Abbruch = True
+End If
+
+If IsEmpty(t_evak_soll) Or t_evak_soll <= 0 Or (Not IsNumeric(t_evak_soll)) Then
+    Call Fehlercode_zufuegen(Fehler, 220)
+    Fehler.Abbruch = True
+End If
+
+betr_art = Betriebsart(p_1_Ende)
+
+If betr_art <> 1 Then
+    Call Fehlercode_zufuegen(Fehler, 221)
+    Fehler.Abbruch = True
+End If
+
+If Fehler.Abbruch Then Exit Sub
+
+' Dichte, Viskosität und Dampfdruck mit den Werten von Wasser belegen
+rho_BF = 1000
+ny_BF = 1
+p_SD_BF_T_BF = Exp(18.3036 - 3816.44 / (273.15 + T_BF - 46.13)) * 1013 / 760 + 0.26 ' Sättigungsdampfdruck von Wasser
+
+' Folgende Funktion wird aufgerufen, um maschinenunabhängig Korrekturfaktoren zu berechnen und entsprechende Fehlercodes zu sammeln,
+' für den Nutzer mögliche Ursachen aufzuzeigen, falls keine (fehlerfrei betreibbare) Maschinen bei der Suche gefunden werden
+Call Berechne_Lambda(Fehler, Empty, Empty, p_1_Ende, p_2, Empty, Empty, T_1, T_BF, Empty, Empty, ny_BF, rho_BF, p_SD_BF_T_BF, Empty, Empty, Empty, Maschinendaten, Empty, Empty, betr_art, Rel_Feuchte, Empty, Empty, Empty)
+
+Set Listenwerttabelle = Worksheets("Listenwerttabelle")
+
+col_M_ID = Listenwerttabelle.Rows(1).Find("TYP", , , xlWhole).Column
+col_wkst = Listenwerttabelle.Rows(1).Find("WKST").Column
+col_art = Listenwerttabelle.Rows(1).Find("Maschinenart").Column
+col_nl = Listenwerttabelle.Rows(1).Find("NL").Column
+col_px = Listenwerttabelle.Rows(1).Find("PX").Column
+col_sl = Listenwerttabelle.Rows(1).Find("SL").Column
+col_pl = Listenwerttabelle.Rows(1).Find("PL").Column
+col_fb = Listenwerttabelle.Rows(1).Find("FB").Column
+col_betr_art = Listenwerttabelle.Rows(1).Find("Betriebsart").Column
+col_nn = Listenwerttabelle.Rows(1).Find("NN").Column
+col_d_a = Listenwerttabelle.Rows(1).Find("RADDU").Column
+col_geom = Listenwerttabelle.Rows(1).Find("GEOM").Column
+col_n_max = Listenwerttabelle.Rows(1).Find("NMAX").Column
+col_E_Zahl_A = Listenwerttabelle.Rows(1).Find("EZAHLA").Column
+col_E_Zahl_B = Listenwerttabelle.Rows(1).Find("EZAHLB").Column
+col_p2_max = Listenwerttabelle.Rows(1).Find("P2MAX").Column
+col_dp_min = Listenwerttabelle.Rows(1).Find("DPMIN").Column
+col_dp_max = Listenwerttabelle.Rows(1).Find("DPMAX").Column
+col_t3_min = Listenwerttabelle.Rows(1).Find("T3MIN").Column
+col_t3_max = Listenwerttabelle.Rows(1).Find("T3MAX").Column
+col_t1_min = Listenwerttabelle.Rows(1).Find("T1MIN").Column
+col_t1t_max = Listenwerttabelle.Rows(1).Find("T1TMAX").Column
+col_t1f_max = Listenwerttabelle.Rows(1).Find("T1FMAX").Column
+
+dataset_row = CONST_dataset_row_start
+Do
+    Fehler_intern = Fehler_leer
+    
+    Maschinendaten.Art = Listenwerttabelle.Cells(dataset_row, col_art)
+    Maschinendaten.b__d_a = Listenwerttabelle.Cells(dataset_row, col_geom)
+    Maschinendaten.d_a = Listenwerttabelle.Cells(dataset_row, col_d_a)
+    Maschinendaten.Delta_p_max = Listenwerttabelle.Cells(dataset_row, col_dp_max)
+    Maschinendaten.Delta_p_min = Listenwerttabelle.Cells(dataset_row, col_dp_min)
+    Maschinendaten.E_Zahl_A = Listenwerttabelle.Cells(dataset_row, col_E_Zahl_A)
+    Maschinendaten.E_Zahl_B = Listenwerttabelle.Cells(dataset_row, col_E_Zahl_B)
+    Maschinendaten.n_max = Listenwerttabelle.Cells(dataset_row, col_n_max)
+    Maschinendaten.n_nenn = Listenwerttabelle.Cells(dataset_row, col_nn)
+    Maschinendaten.p_2_max = Listenwerttabelle.Cells(dataset_row, col_p2_max)
+    Maschinendaten.T_1_min = Listenwerttabelle.Cells(dataset_row, col_t1_min)
+    Maschinendaten.T_1F_max = Listenwerttabelle.Cells(dataset_row, col_t1f_max)
+    Maschinendaten.T_3_min = Listenwerttabelle.Cells(dataset_row, col_t3_min)
+    Maschinendaten.T_3_max = Listenwerttabelle.Cells(dataset_row, col_t3_max)
+
+    ' Kennfeldmatrix bei der Maschine ab dataset_row zusammenbauen und in Sub-internen Static-Variablen speichern
+    Call Kennfeldmatrix(Fehler_intern, M_ID, W_ID, 1, n_Liste_i, p_x_j, V_1_Liste_ij, P_mech_Liste_ij, V_BF_Liste_ij, dataset_row)
+    If Not IsEmpty(M_ID) Then
+        i = 0
+        Do
+            i = i + 1
+            If IsEmpty(n_nenn_Faktor) Then
+                n_such = n_Liste_i(i)
+            Else
+                n_such = Maschinendaten.n_nenn * n_nenn_Faktor
+            End If
+        
+            Call Evakuierungszeit(Fehler_intern, M_ID, W_ID, n_such, V_Behaelter, p_1_Beginn, p_1_Ende, p_2, T_1, T_BF, V_1_norm_Leckage, Ber_Grp, t_evak)
+            
+            If t_evak >= (1 - t_evak_Toleranz_minus) * t_evak_soll And t_evak <= (1 + t_evak_Toleranz_plus) * t_evak_soll Then
+        
+                k = k + 1
+                If k = 1 Then
+                    ReDim Maschinen_ID_Auswahl(1 To 1)
+                    ReDim Werkstoff_ID_Auswahl(1 To 1)
+                    ReDim n_Auswahl(1 To 1)
+                    ReDim t_evak_Auswahl(1 To 1)
+                    ReDim Fehlerart_Auswahl(1 To 1)
+                Else
+                    ReDim Preserve Maschinen_ID_Auswahl(1 To k)
+                    ReDim Preserve Werkstoff_ID_Auswahl(1 To k)
+                    ReDim Preserve n_Auswahl(1 To k)
+                    ReDim Preserve t_evak_Auswahl(1 To k)
+                    ReDim Preserve Fehlerart_Auswahl(1 To k)
+                End If
+                
+                Maschinen_ID_Auswahl(k) = M_ID
+                Werkstoff_ID_Auswahl(k) = W_ID
+                n_Auswahl(k) = n_such
+                t_evak_Auswahl(k) = Round(t_evak)
+                Fehlerart_Auswahl(k) = Fehlerart_kritisch(Fehler_intern)
+            End If
+        Loop Until (Not IsEmpty(n_nenn_Faktor)) Or (i >= UBound(n_Liste_i))
+    End If
+Loop Until IsEmpty(dataset_row)
+
+Call Fehler_doppelt_entfernen(Fehler)
+'MsgBox (Timer - t1)    ' Benchmark
+
+
+End Sub
+	 * 
+	 * */
+	
+	
+	public static void machineSelectionForEvacuationTime(ErrorCodeTable Fehler,
+		    List<String> Maschinen_ID_Auswahl,
+		    List<String> Werkstoff_ID_Auswahl,
+		    List<Double> n_Auswahl,
+		    List<Double> t_evak_Auswahl,
+		    List<Integer> Fehlerart_Auswahl,
+		    double t_evak_soll,
+		    double V_Behaelter,
+		    double p_1_Beginn,
+		    double p_1_Ende,
+		    double p_2,
+		    double T_1,
+		    double T_BF,
+		    double V_1_norm_Leckage,
+		    Double n_nenn_Faktor,
+		    double t_evak_Toleranz_plus,
+		    double t_evak_Toleranz_minus,
+		    String Ber_Grp)
+	{
+		
+	}
+	
 }

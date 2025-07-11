@@ -201,6 +201,13 @@ private boolean stc_m_1_Gas_Total_Given;
 	private String t_evak_tolerance_plus;//Formular_t_evak_Toleranz_plus;
 	
 	private String Form_t_evak_tolerance_minus;//Formular_t_evak_Toleranz_minus
+	
+	private boolean t_evak_soll;
+	
+	private boolean cb1_evak;
+	
+	//check box auch Maschinen mit Warnungen zeigen    -- English - also show machines with warnings
+	
 	public String getMaterialID() {
 		return materialID;
 	}
@@ -1014,5 +1021,21 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setForm_t_evak_tolerance_minus(String form_t_evak_tolerance_minus) {
 		Form_t_evak_tolerance_minus = form_t_evak_tolerance_minus;
+	}
+
+	public boolean isT_evak_soll() {
+		return t_evak_soll;
+	}
+
+	public void setT_evak_soll(boolean t_evak_soll) {
+		this.t_evak_soll = t_evak_soll;
+	}
+
+	public boolean isCb1_evak() {
+		return cb1_evak;
+	}
+
+	public void setCb1_evak(boolean cb1_evak) {
+		this.cb1_evak = cb1_evak;
 	}
 }
