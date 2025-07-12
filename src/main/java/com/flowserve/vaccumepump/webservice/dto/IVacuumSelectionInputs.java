@@ -205,7 +205,8 @@ private boolean stc_m_1_Gas_Total_Given;
 	private boolean t_evak_soll;
 	
 	private boolean cb1_evak;
-	
+	//ComboBox_Gasstrahler  -- ComboBox_Gas heater
+		private List<GasHeater> gasHeaterList=new ArrayList<GasHeater>();
 	//check box auch Maschinen mit Warnungen zeigen    -- English - also show machines with warnings
 	
 	public String getMaterialID() {
@@ -1037,5 +1038,13 @@ private boolean stc_m_1_Gas_Total_Given;
 
 	public void setCb1_evak(boolean cb1_evak) {
 		this.cb1_evak = cb1_evak;
+	}
+
+	public List<GasHeater> getGasHeaterList() {
+		return gasHeaterList;
+	}
+
+	public void setGasHeaterList(List<GasHeater> gasHeaterList) {
+		this.gasHeaterList = gasHeaterList;
 	}
 }

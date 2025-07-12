@@ -3131,4 +3131,138 @@ End Sub
 		
 	}
 	
+	
+	
+	
+	
+	/*/
+	 * 
+	 * Public Sub Gasstrahler_Betriebspunkt(Fehler As Fehlercodetyp, Gasstrahler_ID, Maschinen_ID, p_1, V_1_Gas, V_Treibstrom)
+
+' -----------------------------------------------------------------------------------------------
+' Diese Funktion gibt den Ansaugvolumenstrom der übergebenen Gasstrahler-Pumpe-Kombination in
+' Abhängigkeit des Ansaugdrucks zurück.
+' Es wird nur der Betrieb bei Standardbedingungen berechnet, d.h. Luft (20°C),
+' Wasser als Betriebsflüssigkeit der Flüssigkeitsringvakuumpumpe
+' Betriebsflüssigkeitstemperatur: 15°C bzw. 30°C je nach Strahlerausführung
+'
+' Ein- und Ausgabeparameter
+'   Fehler
+'
+' Eingabeparameter
+'   Gasstrahler_ID                  ID des Gasstrahlers, z.B. "GEV_1200A"
+'   Maschinen_ID                    ID der Flüssigkeitsringvakuumpumpe, z.B. "LEH_1200"
+'   p_1                             Ansaugdruck [mbar]
+'
+' Ausgabeparameter
+'   V_1_Gas                         Gesamt-Gasvolumenstrom am Saugstutzen [m³/h]
+'   V_Treibstrom                    Normierter Treibgasvolumenstrom [Nm³/h] (Normatmosphäre 1013mbar, 0°C)
+'
+' -----------------------------------------------------------------------------------------------
+
+Dim Gasstrahlertabelle As Worksheet
+Dim col_G_ID, col_M_ID, col_px1, col_vol11
+Dim col_n, col_treib
+Dim search_range As Range, found_range As Range
+Dim first_row, found_row, dataset_row
+Dim found_once As Boolean
+Dim V_1_interpoliert
+Dim M_ID
+Dim i As Integer
+Dim p_i(1 To 6) As Double
+Dim V_1_i(1 To 6) As Double
+Dim V_1_a, V_1_b, V_1_c, V_1_d
+Dim extrapolation
+
+If Fehler.Abbruch Then Exit Sub
+
+If Not IsEmpty(p_1) Then
+    If Not IsNumeric(p_1) Or p_1 <= 0 Then
+        Call Fehlercode_zufuegen(Fehler, 214, "p_1")
+        Fehler.Abbruch = True
+    End If
+End If
+If IsEmpty(p_1) Then Exit Sub
+
+If Fehler.Abbruch Then Exit Sub
+
+Set Gasstrahlertabelle = Worksheets("Gasstrahlertabelle")
+
+col_G_ID = Gasstrahlertabelle.Rows(1).Find("TYP", , , xlWhole).Column
+col_M_ID = Gasstrahlertabelle.Rows(1).Find("PUMPE", , , xlWhole).Column
+col_px1 = Gasstrahlertabelle.Rows(1).Find("PX1", , , xlWhole).Column
+col_vol11 = Gasstrahlertabelle.Rows(1).Find("VOL11", , , xlWhole).Column
+col_n = Gasstrahlertabelle.Rows(1).Find("RPM", , , xlWhole).Column
+col_treib = Gasstrahlertabelle.Rows(1).Find("TREIB", , , xlWhole).Column
+    
+Set search_range = Gasstrahlertabelle.Columns(col_G_ID)
+first_row = 0
+found_row = 0
+found_once = False
+dataset_row = 0
+Do
+    If Not found_once Then
+        Set found_range = search_range.Find(Gasstrahler_ID, , , xlWhole)
+        If Not found_range Is Nothing Then
+            found_once = True
+            found_row = found_range.Row
+        End If
+    Else
+        If first_row = 0 Then first_row = found_range.Row
+        Set found_range = search_range.FindNext(found_range)
+        found_row = found_range.Row
+    End If
+    If (Not found_range Is Nothing) And (found_row <> first_row) Then
+        M_ID = Gasstrahlertabelle.Cells(found_row, col_M_ID)
+        If M_ID = Maschinen_ID Then
+            dataset_row = found_row
+            Exit Do
+        End If
+    End If
+Loop Until found_range Is Nothing Or found_row = first_row
+
+If dataset_row > 0 Then
+
+    For i = 1 To 6
+        p_i(i) = Gasstrahlertabelle.Cells(dataset_row, col_px1 + (i - 1))
+        V_1_i(i) = Gasstrahlertabelle.Cells(dataset_row, col_vol11 + (i - 1))
+    Next i
+    
+    Call cubic_spline_coeff(p_i, V_1_i, V_1_a, V_1_b, V_1_c, V_1_d)
+    V_1_interpoliert = cubic_spline_interpolation(p_i, V_1_a, V_1_b, V_1_c, V_1_d, p_1, extrapolation)
+    
+    If IsEmpty(extrapolation) Then
+        V_1_Gas = V_1_interpoliert
+        'n = Gasstrahlertabelle.Cells(dataset_row, col_n)
+        V_Treibstrom = Gasstrahlertabelle.Cells(dataset_row, col_treib)
+    Else
+        Call Fehlercode_zufuegen(Fehler, 216)
+        Fehler.Abbruch = True
+    End If
+Else
+    Call Fehlercode_zufuegen(Fehler, 217)
+    Fehler.Abbruch = True
+End If
+
+End Sub
+
+
+	 * 
+	 * 
+	 */
+	//Gasstrahler_Betriebspunkt
+	
+
+	
+	public static void gasJetOperatingPoint(ErrorCodeTable error, int i, int j, double p_1, double v_1_Gas, double v_Treibstrom)
+	{
+		
+	}
+	
+	
+	
+	
+	
+	
+	
 }

@@ -158,6 +158,8 @@ private double bf;//Betriebsflüssigkeit (Formular_BF)
 private String[][] machineSelectionTextBox;//listBoxArray;//Listbox_Maschinenauswahl Text box 
 
 
+private double gas_Emitter_V_1; //Formular_Gasstrahler_V_1
+private double gasJet_V_DriveCurrent; //Formular_Gasstrahler_V_Treibstrom
 private int  numberOfRecordsEvak;    //Formular_Anzahl_Datensätze_evak
 	public String getMachineType() {
 		return machineType;
@@ -930,6 +932,22 @@ private int  numberOfRecordsEvak;    //Formular_Anzahl_Datensätze_evak
 
 	public void setNumberOfRecordsEvak(int numberOfRecordsEvak) {
 		this.numberOfRecordsEvak = numberOfRecordsEvak;
+	}
+
+	public double getGas_Emitter_V_1() {
+		return gas_Emitter_V_1;
+	}
+
+	public void setGas_Emitter_V_1(double gas_Emitter_V_1) {
+		this.gas_Emitter_V_1 = gas_Emitter_V_1;
+	}
+
+	public double getGasJet_V_DriveCurrent() {
+		return gasJet_V_DriveCurrent;
+	}
+
+	public void setGasJet_V_DriveCurrent(double gasJet_V_DriveCurrent) {
+		this.gasJet_V_DriveCurrent = gasJet_V_DriveCurrent;
 	}
 
 }
