@@ -98,7 +98,7 @@ End Sub
 		// ===== Core Logic Equivalent to Gasstrahler_Betriebspunkt Call =====
 	    // Below is placeholder logic. Replace this with actual computation logic.
 	    // Simulating a function that sets V_1_Gas and V_Treibstrom based on inputs
-		
+
 		double p_1=input.getP_1();
 		//Public Sub Gasstrahler_Betriebspunkt(Fehler As Fehlercodetyp, Gasstrahler_ID, Maschinen_ID, p_1, V_1_Gas, V_Treibstrom)
 		ErrorCodeTable error=new ErrorCodeTable();
