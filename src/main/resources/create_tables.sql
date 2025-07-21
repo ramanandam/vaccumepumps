@@ -64,6 +64,50 @@ CREATE TABLE error_table (
 );
 
 
+CREATE TABLE "SYSTEM"."SUBSTANCE_DATA_TABLE" (
+    medium_id     NUMBER,
+    formula       VARCHAR2(50),
+    mol           NUMBER(30, 15),
+    tflus         NUMBER(30, 15),
+    tsied         NUMBER(30, 15),
+    tkrit         NUMBER(30, 15),
+    pkrit         NUMBER(30, 15),
+    vkrit         NUMBER(30, 15),
+    omega         NUMBER(30, 15),
+    tq            VARCHAR2(50),
+    eq            VARCHAR2(50),
+    tmax          NUMBER(30, 15),
+    tmin          NUMBER(30, 15),
+    pda           NUMBER(30, 15),
+    pdb           NUMBER(30, 15),
+    pdc           NUMBER(30, 15),
+    pdd           NUMBER(30, 15),
+    pdy           NUMBER,
+    aq            VARCHAR2(50),
+    roa           NUMBER(30, 15),
+    rob           NUMBER(30, 15),
+    roc           NUMBER(30, 15),
+    rod           NUMBER(30, 15),
+    roy           NUMBER,
+    rq            VARCHAR2(50),
+    vfa           NUMBER(30, 10),
+    vfb           NUMBER(30, 15),
+    vfc           NUMBER(30, 15),
+    vfd           NUMBER(30, 15),
+    vfy           NUMBER,
+    vq            VARCHAR2(50),
+    cpa           NUMBER(30, 15),
+    cpb           NUMBER(30, 15),
+    cpc           NUMBER(30, 15),
+    cpd           NUMBER(30, 15),
+    cpy           NUMBER,
+    cq            VARCHAR2(50),
+    permission_group    NUMBER,
+    supply_liquid NUMBER
+);
+
+
+
 CREATE TABLE "SYSTEM"."SUBSTANCE_NAME_TABLE" (
 
     medium_name_id	number,
