@@ -7,6 +7,199 @@ import com.flowserve.vaccumepump.webservice.model.ErrorCodeTable;
 public class FormUtil {
 
 	
+	//verfuegbare_Drehzahlen - called when click on Werkstoff in Machine Controller.
+	
+	/*
+	 * 
+	 * Sub verfuegbare_Drehzahlen()
+' Drehzahl-Auswahlbox aktualisieren
+
+Dim Formular As Worksheet, Listenwerttabelle As Worksheet
+Dim M_ID As String
+Dim W_ID As Variant
+Dim betr_art As Integer
+Dim col_M_ID As Integer, col_W_ID As Integer, col_betr_art As Integer, col_nl As Integer, col_point As Integer
+Dim ListBox_NL_1 As Object, ListBox_NL_2 As Object
+Dim i As Integer
+Dim search_range As Range, found_range As Range, first_row As Long, found_row As Long, found_once As Boolean
+
+Set Formular = Worksheets("Formular")
+Set Listenwerttabelle = Worksheets("Listenwerttabelle")
+Set ListBox_NL_1 = Formular.OLEObjects("ListBox_NL_1").Object
+Set ListBox_NL_2 = Formular.OLEObjects("ListBox_NL_2").Object
+
+Application.Names("Formular_Drehzahl").RefersToRange = Empty
+
+ListBox_NL_1.Clear
+ListBox_NL_2.Clear
+
+M_ID = Application.Names("Formular_Maschinen_ID").RefersToRange
+W_ID = Application.Names("Formular_Werkstoff_ID").RefersToRange
+
+col_M_ID = Listenwerttabelle.Rows(1).Find("TYP").Column
+col_W_ID = Listenwerttabelle.Rows(1).Find("WKST").Column
+col_betr_art = Listenwerttabelle.Rows(1).Find("Betriebsart").Column
+col_nl = Listenwerttabelle.Rows(1).Find("NL").Column
+col_point = Listenwerttabelle.Rows(1).Find("point").Column
+
+Set search_range = Listenwerttabelle.Columns(col_M_ID)
+first_row = 0
+found_row = 0
+found_once = False
+Do
+    If Not found_once Then
+        Set found_range = search_range.Find(M_ID, , , xlWhole)
+        If Not found_range Is Nothing Then
+            found_once = True
+            found_row = found_range.Row
+        End If
+    Else
+        If first_row = 0 Then first_row = found_range.Row
+        Set found_range = search_range.FindNext(found_range)
+        found_row = found_range.Row
+    End If
+    If (Not found_range Is Nothing) And (found_row <> first_row) Then
+        If (CInt(Listenwerttabelle.Cells(found_row, col_W_ID)) = CInt(W_ID)) And (Listenwerttabelle.Cells(found_row, col_point) = 1) Then
+            betr_art = Listenwerttabelle.Cells(found_row, col_betr_art)
+            If betr_art = 1 Then
+                ListBox_NL_1.AddItem (Listenwerttabelle.Cells(found_row, col_nl))
+            ElseIf betr_art = 2 Then
+                ListBox_NL_2.AddItem (Listenwerttabelle.Cells(found_row, col_nl))
+            End If
+        End If
+    End If
+Loop Until found_range Is Nothing Or found_row = first_row
+
+End Sub
+	 * 
+	 * 
+	 * */
+	
+	
+	public static void available_speeds()
+	{
+		
+	}
+	
+	
+	/*
+	 * 
+	 * Private Sub Kennlinie_darstellen(Maschinen_ID, Werkstoff_ID As Integer, betr_art, n As Double)
+
+Const test_anz_stellen = 30
+
+Dim Formular As Worksheet
+Dim Fehler As Fehlercodetyp
+Dim Chart_Saugvermoegen As Chart
+Dim Serie_Saugvermoegen As Series
+Dim Chart_Leistungsaufnahme As Chart
+Dim Serie_Leistungsaufnahme As Series
+
+Dim i As Integer, j As Integer
+Dim n_Liste_i, p_x_j, V_1_Liste_ij, P_Liste_ij
+Dim values_p, values_sl, values_pl
+Dim p_min
+Dim Axis_p_sl As Axis, axis_p_pl As Axis
+
+Set Formular = Worksheets("Formular")
+Set Chart_Saugvermoegen = Formular.ChartObjects.Item(1).Chart
+Set Serie_Saugvermoegen = Chart_Saugvermoegen.SeriesCollection("Saugvermögen")
+Set Chart_Leistungsaufnahme = Formular.ChartObjects.Item(2).Chart
+Set Serie_Leistungsaufnahme = Chart_Leistungsaufnahme.SeriesCollection("Leistungsaufnahme")
+Set Axis_p_sl = Chart_Saugvermoegen.Axes(xlCategory)
+Set axis_p_pl = Chart_Leistungsaufnahme.Axes(xlCategory)
+
+Dim Serie_test As Series
+Dim p_test(1 To test_anz_stellen) As Double
+Dim V_test(1 To test_anz_stellen) As Double
+
+Dim alpha_sl, alpha_pl
+
+Set Serie_test = Chart_Saugvermoegen.SeriesCollection("Test")
+
+For i = 1 To test_anz_stellen
+    p_test(i) = Round(10 ^ (i / (test_anz_stellen / 2) + 1.2), 1)
+Next i
+
+If IsEmpty(Maschinen_ID) Then
+    Serie_Saugvermoegen.XValues = Array(1, 1)
+    Serie_Saugvermoegen.Values = Array(1, 1)
+    Chart_Saugvermoegen.ChartTitle.Text = "Saugvermögen"
+    Serie_Leistungsaufnahme.XValues = Array(1, 1)
+    Serie_Leistungsaufnahme.Values = Array(1, 1)
+    Chart_Leistungsaufnahme.ChartTitle.Text = "Leistungsaufnahme"
+    Exit Sub
+End If
+
+Call Kennfeldmatrix(Fehler, Maschinen_ID, Werkstoff_ID, CInt(betr_art), n_Liste_i, p_x_j, V_1_Liste_ij, P_Liste_ij, Empty)
+Call bicubic_spline_coeff(n_Liste_i, p_x_j, V_1_Liste_ij, alpha_sl)
+Call bicubic_spline_coeff(n_Liste_i, p_x_j, P_Liste_ij, alpha_pl)
+
+ReDim V_1_Liste_j(LBound(p_x_j) To UBound(p_x_j)) As Double
+ReDim P_Liste_j(LBound(p_x_j) To UBound(p_x_j)) As Double
+
+For j = LBound(p_x_j) To UBound(p_x_j)
+    V_1_Liste_j(j) = Round(bicubic_spline_interpolation(n_Liste_i, p_x_j, alpha_sl, n, CDbl(p_x_j(j))))
+    P_Liste_j(j) = Round(bicubic_spline_interpolation(n_Liste_i, p_x_j, alpha_pl, n, CDbl(p_x_j(j))), 2)
+Next j
+
+For j = 1 To test_anz_stellen
+    V_test(j) = Round(bicubic_spline_interpolation(n_Liste_i, p_x_j, alpha_sl, n, p_test(j)))
+Next j
+
+values_p = p_x_j
+values_sl = V_1_Liste_j
+values_pl = P_Liste_j
+
+If Not IsEmpty(values_p) Then
+    Chart_Saugvermoegen.ChartTitle.Text = "Katalog-Saugvermögen für " & Maschinen_ID & " (" & Werkstoff_ID & ") und " & n & " U/min"
+    Chart_Leistungsaufnahme.ChartTitle.Text = "Katalog-Leistungsaufnahme für " & Maschinen_ID & " (" & Werkstoff_ID & ") und " & n & " U/min"
+    
+    If betr_art = 1 Then
+        Chart_Saugvermoegen.ChartTitle.Text = Chart_Saugvermoegen.ChartTitle.Text & vbLf & "Vakuumbetrieb"
+        Chart_Leistungsaufnahme.ChartTitle.Text = Chart_Leistungsaufnahme.ChartTitle.Text & vbLf & "Vakuumbetrieb"
+        Axis_p_sl.AxisTitle.Text = "p_1 [mbar]"
+        Axis_p_sl.MinimumScale = 10 ^ Int(Log(values_p(1)) / Log(10))
+        Axis_p_sl.ScaleType = xlScaleLogarithmic
+        Axis_p_sl.HasMinorGridlines = True
+        Axis_p_sl.MinorGridlines.border.ColorIndex = 15
+        
+        axis_p_pl.AxisTitle.Text = "p_1 [mbar]"
+        axis_p_pl.MinimumScale = 10 ^ Int(Log(values_p(1)) / Log(10))
+        axis_p_pl.ScaleType = xlScaleLogarithmic
+        axis_p_pl.HasMinorGridlines = True
+        axis_p_pl.MinorGridlines.border.ColorIndex = 15
+
+    ElseIf betr_art = 2 Then
+        Chart_Saugvermoegen.ChartTitle.Text = Chart_Saugvermoegen.ChartTitle.Text & vbLf & "Kompressorbetrieb"
+        Chart_Leistungsaufnahme.ChartTitle.Text = Chart_Leistungsaufnahme.ChartTitle.Text & vbLf & "Kompressorbetrieb"
+        Axis_p_sl.AxisTitle.Text = "p_2 [mbar]"
+        Axis_p_sl.ScaleType = xlScaleLinear
+        Axis_p_sl.MinimumScale = 0
+        Axis_p_sl.HasMinorGridlines = False
+        
+        axis_p_pl.AxisTitle.Text = "p_2 [mbar]"
+        axis_p_pl.ScaleType = xlScaleLinear
+        axis_p_pl.MinimumScale = 0
+        axis_p_pl.HasMinorGridlines = False
+        
+    End If
+    
+    Serie_Saugvermoegen.XValues = values_p
+    Serie_Saugvermoegen.Values = values_sl
+    Serie_Leistungsaufnahme.XValues = values_p
+    Serie_Leistungsaufnahme.Values = values_pl
+End If
+
+End Sub
+	 * 
+	 * */
+	public static void showCharacteristicCurve()
+	{
+		
+	}
+
+	
 	// Method to get a description based on Maschinenart value
     public static String getMaschinenartDescription(int maschinenart) {
         switch (maschinenart) {

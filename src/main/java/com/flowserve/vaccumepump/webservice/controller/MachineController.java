@@ -34,7 +34,7 @@ public class MachineController {
 	List<ListValueTable> listValueTableList=new ArrayList<>();
 	
 	
-	
+	//Merged
 	@RequestMapping(method=RequestMethod.GET,path="/hello")
 	public String getHello()
 	{
@@ -47,7 +47,7 @@ public class MachineController {
 	 * Pull the machineIDList as curve_id List from the Machine table respond back
 	 * to UI
 	 */
-
+	//Merged
 	@RequestMapping(value = "/vaccumepumps/rest/machineids", method = RequestMethod.GET)
 	public ResponseEntity<List<String>> getList(HttpServletRequest request) throws SQLException {
 		//HttpStatus errStatus = UserUtils.validateUserRoles(request, ToolkitUserRole.ROLE_ADMIN);
@@ -65,7 +65,7 @@ public class MachineController {
 	}
 	
 	
-	//ComboBox_Maschinen_ID changes in the list byuser 
+	//ComboBox_Maschinen_ID changes in the list by user 
 	/*
 	 * 
 Private Sub ComboBox_Maschinen_ID_Change()
@@ -145,7 +145,7 @@ End Sub
 	 * 
 	 */
 	
-	
+	//Merged
 	@RequestMapping(value = "/vaccumepumps/rest/machineId/change", method = RequestMethod.POST)
 	public ResponseEntity<IVacuumPumpDetails> machineIdChangedInList(@RequestBody IVacuumSelectionInputs input) {
 		// HttpStatus errStatus = UserUtils.validateUserRoles(request,
@@ -227,7 +227,7 @@ End Sub
 	 * 
 	 * End Sub
 	 */
-
+//NotMerged ...when click on Wkst_Click 
 	@RequestMapping(value = "/vaccumepumps/rest/materialId/click", method = RequestMethod.POST)
 	public ResponseEntity<IVacuumPumpDetails> machineIdChangedInList1(@RequestBody IVacuumSelectionInputs input) {
 		// HttpStatus errStatus = UserUtils.validateUserRoles(request,
@@ -237,7 +237,8 @@ End Sub
 		
 
 		String mid = input.getMachineID();
-
+		FormUtil.available_speeds();
+		FormUtil.showCharacteristicCurve();
 		respose = new IVacuumPumpDetails();
 		
 
@@ -247,7 +248,8 @@ End Sub
 	
 	
 	
-	/*
+	/*when click on Vacuum operation -- Vakuumbetrieb
+
 	 * 
 	 * Private Sub Listbox_NL_1_Click()
 
